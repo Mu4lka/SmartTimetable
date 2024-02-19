@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class DatabaseField(str, Enum):
+    ID = "id"
     NAME = "name"
     USER_NAME = "user_name"
     ID_TELEGRAM = "id_telegram"

@@ -30,7 +30,7 @@ async def command_cancel(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-@router.message(StateFilter(None), IsPrivate(), Command("start"))
+@router.message(IsPrivate(), Command("start"))
 async def command_start(message: types.Message):
     buttons = await get_buttons(message)
     if not buttons:
@@ -43,12 +43,12 @@ async def command_start(message: types.Message):
     await show_main_menu(message, buttons)
 
 
-@router.message(StateFilter(None), IsPrivate(), Command("help"))
+@router.message(IsPrivate(), Command("help"))
 async def command_help(message: types.Message):
     await message.answer(f"Нужна помощь?")
 
 
-@router.message(StateFilter(None), IsPrivate(), Command("info_bot"))
+@router.message(IsPrivate(), Command("info_bot"))
 async def command_info_bot(message: types.Message):
     await message.answer(f"Creator: @Mu4lka")
 

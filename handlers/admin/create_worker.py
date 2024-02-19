@@ -1,6 +1,3 @@
-import secrets
-import string
-
 from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
@@ -9,6 +6,7 @@ from aiogram.fsm.state import StatesGroup, State
 from UI.data_buttons import admin_buttons
 from UI.get_message_parameters import get_message_parameters
 from UI.show_main_menu import show_main_menu
+from utils.generate_key import generate_key
 from utils.sql.insert import insert
 from enums.database_field import DatabaseField
 from enums.menu import AdminButton
@@ -203,11 +201,3 @@ async def add_worker_in_database(callback_query: types.CallbackQuery, state: FSM
 
     await show_main_menu(callback_query.message, admin_buttons)
     await state.clear()
-
-
-async def generate_key(length=constants.KEY_LENGTH):
-    letters = string.ascii_letters + string.digits
-    array = []
-    for _ in range(length):
-        array.append(secrets.choice(letters))
-    return "".join(array)

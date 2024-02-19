@@ -8,6 +8,7 @@ def create_database():
     connection = sqlite3.connect(f"{database_name}.db")
     cursor = connection.cursor()
     cursor.execute(f'''CREATE TABLE IF NOT EXISTS {table_workers}(
+        {DatabaseField.ID.value} INTEGER PRIMARY KEY AUTOINCREMENT,
         {DatabaseField.NAME.value} TEXT,
         {DatabaseField.USER_NAME.value} TEXT,
         {DatabaseField.ID_TELEGRAM.value} INTEGER,

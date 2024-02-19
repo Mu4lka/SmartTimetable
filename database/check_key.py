@@ -6,9 +6,9 @@ from utils.sql.select import select
 
 
 async def check_key(key: str, user_id: int, user_name: str):
-    results = await select(database_name, table_workers, f"{DatabaseField.KEY.value}= ?", key)
+    result = await select(database_name, table_workers, f"{DatabaseField.KEY.value}= ?", key)
 
-    if len(results) == 0:
+    if len(result) == 0:
         return False
 
     connection = sqlite3.connect(f"{database_name}.db")
