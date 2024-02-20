@@ -1,10 +1,8 @@
 import secrets
 import string
 
-from data import constants
 
-
-async def generate_key(length=constants.KEY_LENGTH):
+async def generate_key(length: int):
     letters = string.ascii_letters + string.digits
     array = []
     for _ in range(length):

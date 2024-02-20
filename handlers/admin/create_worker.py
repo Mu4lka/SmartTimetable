@@ -187,7 +187,7 @@ async def update_possible_weekend(message: str, callback_query: types.CallbackQu
 async def add_worker_in_database(callback_query: types.CallbackQuery, state: FSMContext):
     from database.database_config import database_name, table_workers
 
-    await state.update_data(key=await generate_key())
+    await state.update_data(key=await generate_key(constants.KEY_LENGTH))
     user_data = await state.get_data()
     user_data.pop("week_menu")
 

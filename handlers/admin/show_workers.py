@@ -1,11 +1,10 @@
-import sqlite3
-
 from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 from UI.data_buttons import admin_buttons, worker_settings_buttons
+from UI.get_message_parameters import get_message_parameters
 from UI.make_inline_keyboard import make_inline_keyboard
 from UI.show_main_menu import show_main_menu
 from data import constants
@@ -14,12 +13,14 @@ from enums.database_field import DatabaseField
 from enums.menu import AdminButton
 from enums.worker_setting import WorkerSetting
 from filters.is_admin import IsAdmin
+from utils.generate_key import generate_key
 from utils.sql.delete import delete
+from utils.sql.execute import execute
 from utils.sql.select import select
 
 
 class ActionOnWorker(StatesGroup):
-    id = State()
+    worker_id = State()
     setting = State()
 
 
@@ -28,31 +29,53 @@ router = Router()
 
 @router.callback_query(StateFilter(None), IsAdmin(), F.data == AdminButton.SHOW_WORKERS.value)
 async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
-    workers_names = await select(database_name, table_workers, columns=[DatabaseField.NAME.value])
-    if len(workers_names) == 0:
+    result = await select(
+        database_name,
+        table_workers,
+        columns=[DatabaseField.NAME.value, DatabaseField.ID.value]
+    )
+    if len(result) == 0:
         await callback_query.message.edit_text(constants.NO_WORKERS)
         await show_main_menu(callback_query.message, admin_buttons)
         return
 
-    names = []
-    for worker_name in workers_names:
-        names.append(worker_name[0])
+    workers = {}
+    for worker in result:
+        workers.update({str(worker[0]): str(worker[1])})
 
     await callback_query.message.edit_text(
         constants.LIST_WORKERS,
-        reply_markup=await make_inline_keyboard(names, True)
+        reply_markup=await make_inline_keyboard(workers)
     )
-    await state.set_state(ActionOnWorker.id)
+    await state.set_state(ActionOnWorker.worker_id)
 
 
-@router.callback_query(StateFilter(ActionOnWorker.id), IsAdmin())
+@router.callback_query(StateFilter(ActionOnWorker.worker_id), IsAdmin())
 async def take_worker_id(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.update_data(id=int(callback_query.data) + 1)
+    await state.update_data(id=int(callback_query.data))
     await callback_query.message.edit_text(
         constants.WORKER_SETTINGS,
         reply_markup=await make_inline_keyboard(worker_settings_buttons)
     )
     await state.set_state(ActionOnWorker.setting)
+
+
+@router.callback_query(
+    StateFilter(ActionOnWorker.setting),
+    IsAdmin(),
+    F.data == WorkerSetting.EDIT_PARAMETERS.value
+)
+async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    worker = await select(database_name,
+                          table_workers,
+                          f"{DatabaseField.ID.value} = ?",
+                          user_data[DatabaseField.ID.value]
+                          )
+    print(list(worker[0]))
+    await callback_query.message.answer(f"Редактирование параметров. Параметры")
+    await show_main_menu(callback_query.message, admin_buttons)
+    await state.clear()
 
 
 @router.callback_query(
@@ -76,31 +99,20 @@ async def delete_worker(callback_query: types.CallbackQuery, state: FSMContext):
 @router.callback_query(
     StateFilter(ActionOnWorker.setting),
     IsAdmin(),
-    F.data == WorkerSetting.EDIT_PARAMETERS.value
-)
-async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.answer("Редактирование параметров")
-    pass
-
-
-@router.callback_query(
-    StateFilter(ActionOnWorker.setting),
-    IsAdmin(),
     F.data == WorkerSetting.RESTORE_ACCESS.value
 )
 async def restore_access(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    key = await generate_key(constants.KEY_LENGTH)
+    await execute(database_name,
+                  f"UPDATE {table_workers} SET "
+                  f"{DatabaseField.ID_TELEGRAM.value} = ?,"
+                  f"{DatabaseField.USER_NAME.value} = ?,"
+                  f"{DatabaseField.KEY.value} = ?"
+                  f"WHERE {DatabaseField.ID.value} = ?",
+                  (None, None, key, user_data[DatabaseField.ID.value],)
+                  )
 
-    connection = sqlite3.connect(f"{database_name}.db")
-    cursor = connection.cursor()
-    cursor.execute(f"UPDATE {table_workers} SET "
-                   f"{DatabaseField.ID_TELEGRAM.value} = ?,"
-                   f"{DatabaseField.USER_NAME.value} = ?"
-                   f"WHERE {DatabaseField.ID.value} = ?",
-                   (None, None, user_data[DatabaseField.ID.value],))
-    connection.commit()
-    connection.close()
-
-    await callback_query.message.answer("Доступ восстановлен")
+    await callback_query.message.answer(f"{constants.ACCESS_RESTORED}\n\nКлюч: {key}")
     await show_main_menu(callback_query.message, admin_buttons)
     await state.clear()

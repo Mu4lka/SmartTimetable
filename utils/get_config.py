@@ -4,7 +4,7 @@ import sys
 import keyboard
 
 
-def get_config(path):
+def get_config(path: str):
     if not os.path.exists(path):
         create_config(path)
         keyboard.read_key()
@@ -14,7 +14,7 @@ def get_config(path):
         return json.load(path)
 
 
-def create_config(path):
+def create_config(path: str):
     with open(path, 'w') as config_path:
         config = {
             "bot_token": "BOT_TOKEN",

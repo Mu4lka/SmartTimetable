@@ -23,7 +23,7 @@ async def show_timetable(callback_query: types.CallbackQuery):
     await show_main_menu(callback_query.message, user_id=callback_query.from_user.id)
 
 
-@router.message(IsPrivate(), F.text == Button.CANCEL.value)
+@router.message(IsPrivate(), IsAuthorized(), F.text == Button.CANCEL.value)
 async def command_cancel(message: types.Message, state: FSMContext):
     await message.answer(constants.CANCEL)
     await show_main_menu(message)
@@ -31,7 +31,8 @@ async def command_cancel(message: types.Message, state: FSMContext):
 
 
 @router.message(IsPrivate(), Command("start"))
-async def command_start(message: types.Message):
+async def command_start(message: types.Message, state: FSMContext):
+    await state.clear()
     buttons = await get_buttons(message)
     if not buttons:
         await message.answer(f"Привет {message.from_user.first_name}! {constants.ABOUT_NOT_AUTHORIZED})",
