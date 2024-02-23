@@ -11,9 +11,10 @@ class IsWorker(Filter):
         if user_id is None:
             user_id = message.from_user.id
 
-        result = await select(database_name,
-                              table_workers,
-                              f"{DatabaseField.ID_TELEGRAM.value} = ?",
-                              user_id
-                              )
+        result = await select(
+            database_name,
+            table_workers,
+            f"{DatabaseField.ID_TELEGRAM.value} = ?",
+            user_id
+        )
         return not len(result) == 0

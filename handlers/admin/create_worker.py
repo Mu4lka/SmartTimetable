@@ -4,12 +4,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 from UI.data_buttons import admin_buttons
-from UI.get_message_parameters import get_message_parameters
+from UI.make_text_parameters import make_text_parameters
 from UI.show_main_menu import show_main_menu
 from utils.generate_key import generate_key
 from utils.sql.insert import insert
 from enums.database_field import DatabaseField
-from enums.menu import AdminButton
+from enums.main_menu import AdminButton
 from filters.is_admin import IsAdmin
 from data import constants
 from UI.make_inline_keyboard import make_inline_keyboard
@@ -195,7 +195,7 @@ async def add_worker_in_database(callback_query: types.CallbackQuery, state: FSM
 
     await callback_query.message.edit_text(
         constants.ABOUT_CREATING_WORKER +
-        await get_message_parameters(constants.descriptions_worker_parameters, user_data) +
+        await make_text_parameters(constants.descriptions_worker_parameters, user_data) +
         constants.ABOUT_SENDING_KEY_TO_WORKER
     )
 

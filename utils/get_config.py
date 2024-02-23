@@ -17,8 +17,11 @@ def get_config(path: str):
 def create_config(path: str):
     with open(path, 'w') as config_path:
         config = {
-            "bot_token": "BOT_TOKEN",
-            "admin_ids": [1000000000, 1111111111]
+            "bot_token": "токен бота",
+            "admin_ids": [1000000000, 1111111111],
+            "link_to_timetable": "Cсылка на гугл таблицу",
+            "credentials_file": "название файла реквизитов для входа сервисного аккаунта",
+            "spreadsheet_id": "Aйди гугл таблицы"
         }
         json.dump(config, config_path)
         print(f"Не нашел файл {path}, в следствии чего он был создан, "

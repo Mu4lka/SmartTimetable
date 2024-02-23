@@ -17,5 +17,4 @@ class AdminButton(str, Enum):
 
 class WorkerButton(str, Enum):
     SHOW_MY_TIMETABLE = "Показать мое расписание"
-    CHANGE_SHIFT = "Изменить смену"
     SELECT_WEEKEND = "Выбрать выходные"

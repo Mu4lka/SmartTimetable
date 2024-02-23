@@ -4,14 +4,13 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 from UI.data_buttons import admin_buttons, worker_settings_buttons
-from UI.get_message_parameters import get_message_parameters
 from UI.make_inline_keyboard import make_inline_keyboard
 from UI.show_main_menu import show_main_menu
 from data import constants
 from database.database_config import table_workers, database_name
 from enums.database_field import DatabaseField
-from enums.menu import AdminButton
-from enums.worker_setting import WorkerSetting
+from enums.main_menu import AdminButton
+from enums.button_worker_setting import ButtonWorkerSetting
 from filters.is_admin import IsAdmin
 from utils.generate_key import generate_key
 from utils.sql.delete import delete
@@ -63,15 +62,16 @@ async def take_worker_id(callback_query: types.CallbackQuery, state: FSMContext)
 @router.callback_query(
     StateFilter(ActionOnWorker.setting),
     IsAdmin(),
-    F.data == WorkerSetting.EDIT_PARAMETERS.value
+    F.data == ButtonWorkerSetting.EDIT_PARAMETERS.value
 )
 async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    worker = await select(database_name,
-                          table_workers,
-                          f"{DatabaseField.ID.value} = ?",
-                          user_data[DatabaseField.ID.value]
-                          )
+    worker = await select(
+        database_name,
+        table_workers,
+        f"{DatabaseField.ID.value} = ?",
+        user_data[DatabaseField.ID.value]
+    )
     print(list(worker[0]))
     await callback_query.message.answer(f"Редактирование параметров. Параметры")
     await show_main_menu(callback_query.message, admin_buttons)
@@ -81,15 +81,17 @@ async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext
 @router.callback_query(
     StateFilter(ActionOnWorker.setting),
     IsAdmin(),
-    F.data == WorkerSetting.DELETE_WORKER.value
+    F.data == ButtonWorkerSetting.DELETE_WORKER.value
 )
 async def delete_worker(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
 
-    await delete(database_name,
-                 table_workers,
-                 f"{DatabaseField.ID.value} = ?",
-                 user_data[DatabaseField.ID.value])
+    await delete(
+        database_name,
+        table_workers,
+        f"{DatabaseField.ID.value} = ?",
+        user_data[DatabaseField.ID.value]
+    )
 
     await callback_query.message.edit_text(constants.REMOVE_WORKER)
     await show_main_menu(callback_query.message, admin_buttons)
@@ -99,19 +101,20 @@ async def delete_worker(callback_query: types.CallbackQuery, state: FSMContext):
 @router.callback_query(
     StateFilter(ActionOnWorker.setting),
     IsAdmin(),
-    F.data == WorkerSetting.RESTORE_ACCESS.value
+    F.data == ButtonWorkerSetting.RESTORE_ACCESS.value
 )
 async def restore_access(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     key = await generate_key(constants.KEY_LENGTH)
-    await execute(database_name,
-                  f"UPDATE {table_workers} SET "
-                  f"{DatabaseField.ID_TELEGRAM.value} = ?,"
-                  f"{DatabaseField.USER_NAME.value} = ?,"
-                  f"{DatabaseField.KEY.value} = ?"
-                  f"WHERE {DatabaseField.ID.value} = ?",
-                  (None, None, key, user_data[DatabaseField.ID.value],)
-                  )
+    await execute(
+        database_name,
+        f"UPDATE {table_workers} SET "
+        f"{DatabaseField.ID_TELEGRAM.value} = ?,"
+        f"{DatabaseField.USER_NAME.value} = ?,"
+        f"{DatabaseField.KEY.value} = ?"
+        f"WHERE {DatabaseField.ID.value} = ?",
+        (None, None, key, user_data[DatabaseField.ID.value],)
+    )
 
     await callback_query.message.answer(f"{constants.ACCESS_RESTORED}\n\nКлюч: {key}")
     await show_main_menu(callback_query.message, admin_buttons)
