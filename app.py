@@ -5,7 +5,7 @@ from aiogram import Bot, Router
 from database.create_database import create_database
 from handlers import common
 from handlers.admin import create_worker, show_workers, generate_timetable
-from handlers.worker import swap_shifts, select_weekend, show_my_timetable
+from handlers.worker import change_shift, select_weekend, show_my_timetable
 from loader import dispatcher, bot
 from utils.set_bot_commands import set_default_commands
 from utils.notify_admins import on_startup_notify
@@ -25,7 +25,7 @@ def include_routers():
     )
     worker_routers = Router()
     worker_routers.include_routers(
-        swap_shifts.router,
+        change_shift.router,
         select_weekend.router,
         show_my_timetable.router
     )

@@ -12,12 +12,13 @@ router = Router()
 
 
 class ShiftChange(StatesGroup):
-    swap_shifts = State()
-    setting = State()
+    start = State()
+    take_old_shift = State()
+    take_new_shift = State()
 
 
-@router.callback_query(StateFilter(ShiftChange.swap_shifts), IsWorker(), F.data == OtherButton.SWAP_SHIFTS.value)
-async def swap_shifts(callback_query: types.CallbackQuery, state: FSMContext):
+@router.callback_query(StateFilter(ShiftChange.start), IsWorker(), F.data == OtherButton.CHANGE_SHIFT.value)
+async def change_shift(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.edit_text("В реализации")
     await show_main_menu(callback_query.message, worker_buttons)
     await state.clear()

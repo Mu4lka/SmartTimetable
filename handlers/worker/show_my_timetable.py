@@ -12,8 +12,8 @@ from enums.database_field import DatabaseField
 from enums.main_menu import WorkerButton
 from enums.other_button import OtherButton
 from filters.is_worker import IsWorker
-from google_sheets import service
-from handlers.worker.swap_shifts import ShiftChange
+import google_sheets
+from handlers.worker.change_shift import ShiftChange
 from utils.sql.select import select
 
 router = Router()
@@ -22,18 +22,22 @@ router = Router()
 @router.callback_query(StateFilter(None), IsWorker(), F.data == WorkerButton.SHOW_MY_TIMETABLE.value)
 async def show_my_timetable(callback_query: types.CallbackQuery, state: FSMContext):
     name = await get_name(callback_query.from_user.id)
-    row = await find_row_by_name_from_timetable(name)
+    timetable = await get_timetable_from_google_sheets()
+    row = await find_row_by_name_from_timetable(timetable, name)
     if row is None:
         await callback_query.message.edit_text(
             f"К сожалению Вас, {name}, в расписании не нашел, обратитесь к РОПу"
         )
         await show_main_menu(callback_query.message, worker_buttons)
         return
+
+    shifts = await make_shifts(row)
     await callback_query.message.edit_text(
-        await get_text_about_your_timetable(row),
-        reply_markup=await make_inline_keyboard([OtherButton.SWAP_SHIFTS.value])
+        await get_text_about_your_timetable(shifts),
+        reply_markup=await make_inline_keyboard([OtherButton.CHANGE_SHIFT.value])
     )
-    await state.set_state(ShiftChange.swap_shifts)
+    await state.update_data(timetable=timetable, shifts=shifts)
+    await state.set_state(ShiftChange.start)
 
 
 async def get_name(user_id: int):
@@ -42,29 +46,30 @@ async def get_name(user_id: int):
         table_workers,
         f"{DatabaseField.ID_TELEGRAM.value} = ?",
         user_id,
-        [DatabaseField.NAME.value, ]
+        [DatabaseField.NAME.value]
     )
     return result[0][0]
 
 
-async def find_row_by_name_from_timetable(name: str):
-    result = service.spreadsheets().values().get(
+async def get_timetable_from_google_sheets():
+    result = google_sheets.service.spreadsheets().values().get(
         spreadsheetId=SPREADSHEET_ID,
         range='A1:O100',
         majorDimension='ROWS'
     ).execute()
+    return result.get("values")
 
-    timetable = result.get("values")
 
+async def find_row_by_name_from_timetable(timetable: list, name: str):
     for row in timetable:
         if name in row:
             return row
     return
 
 
-async def get_text_about_your_timetable(row: list):
+async def get_text_about_your_timetable(shifts: list):
     text = ""
-    for day_week, shift in list(zip(constants.week_abbreviated, await make_shifts(row))):
+    for day_week, shift in list(zip(constants.week_abbreviated, shifts)):
         text = text + f"{day_week}: {shift}\n"
     return text
 

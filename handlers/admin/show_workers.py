@@ -51,31 +51,15 @@ async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
 
 @router.callback_query(StateFilter(ActionOnWorker.worker_id), IsAdmin())
 async def take_worker_id(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.update_data(id=int(callback_query.data))
+    try:
+        await state.update_data(id=int(callback_query.data))
+    except Exception:
+        return
     await callback_query.message.edit_text(
         constants.WORKER_SETTINGS,
         reply_markup=await make_inline_keyboard(worker_settings_buttons)
     )
     await state.set_state(ActionOnWorker.setting)
-
-
-@router.callback_query(
-    StateFilter(ActionOnWorker.setting),
-    IsAdmin(),
-    F.data == ButtonWorkerSetting.EDIT_PARAMETERS.value
-)
-async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext):
-    user_data = await state.get_data()
-    worker = await select(
-        database_name,
-        table_workers,
-        f"{DatabaseField.ID.value} = ?",
-        user_data[DatabaseField.ID.value]
-    )
-    print(list(worker[0]))
-    await callback_query.message.answer(f"Редактирование параметров. Параметры")
-    await show_main_menu(callback_query.message, admin_buttons)
-    await state.clear()
 
 
 @router.callback_query(
@@ -117,5 +101,24 @@ async def restore_access(callback_query: types.CallbackQuery, state: FSMContext)
     )
 
     await callback_query.message.answer(f"{constants.ACCESS_RESTORED}\n\nКлюч: {key}")
+    await show_main_menu(callback_query.message, admin_buttons)
+    await state.clear()
+
+
+@router.callback_query(
+    StateFilter(ActionOnWorker.setting),
+    IsAdmin(),
+    F.data == ButtonWorkerSetting.EDIT_PARAMETERS.value
+)
+async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    worker = await select(
+        database_name,
+        table_workers,
+        f"{DatabaseField.ID.value} = ?",
+        user_data[DatabaseField.ID.value]
+    )
+    print(list(worker[0]))
+    await callback_query.message.answer(f"Редактирование параметров. Параметры")
     await show_main_menu(callback_query.message, admin_buttons)
     await state.clear()
