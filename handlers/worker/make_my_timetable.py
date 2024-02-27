@@ -12,9 +12,9 @@ from filters.is_worker import IsWorker
 router = Router()
 
 
-@router.callback_query(StateFilter(None), IsWorker(), F.data == WorkerButton.SELECT_WEEKEND.value)
+@router.callback_query(StateFilter(None), IsWorker(), F.data == WorkerButton.MAKE_MY_TIMETABLE.value)
 async def select_weekend(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.edit_text(
-        f"Команда \"{WorkerButton.SELECT_WEEKEND.value}\" {constants.NOT_AVAILABLE_YET}"
+        f"Команда \"{WorkerButton.MAKE_MY_TIMETABLE.value}\" {constants.NOT_AVAILABLE_YET}"
     )
     await show_main_menu(callback_query.message, worker_buttons)

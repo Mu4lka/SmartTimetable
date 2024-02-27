@@ -31,7 +31,7 @@ async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
     result = await select(
         database_name,
         table_workers,
-        columns=[DatabaseField.NAME.value, DatabaseField.ID.value]
+        columns=[DatabaseField.FULL_NAME.value, DatabaseField.ID.value]
     )
     if len(result) == 0:
         await callback_query.message.edit_text(constants.NO_WORKERS)

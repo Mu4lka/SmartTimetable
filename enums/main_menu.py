@@ -12,9 +12,9 @@ class BaseButton(str, Enum):
 class AdminButton(str, Enum):
     CREATE_WORKER = "Создать сотрудника"
     SHOW_WORKERS = "Показать сотрудников"
-    GENERATE_TIMETABLE = "Сгенерировать расписание"
+    MAKE_TIMETABLE = "Составить расписание"
 
 
 class WorkerButton(str, Enum):
     SHOW_MY_TIMETABLE = "Показать мое расписание"
-    SELECT_WEEKEND = "Выбрать выходные"
+    MAKE_MY_TIMETABLE = "Составить мое расписание"

@@ -46,7 +46,7 @@ async def get_name(user_id: int):
         table_workers,
         f"{DatabaseField.ID_TELEGRAM.value} = ?",
         user_id,
-        [DatabaseField.NAME.value]
+        [DatabaseField.FULL_NAME.value]
     )
     return result[0][0]
 

@@ -9,10 +9,10 @@ async def check_key(key: str, user_id: int, user_name: str):
         database_name,
         table_workers,
         f"{DatabaseField.KEY.value}= ?",
-        key
+        key,
+        columns=[DatabaseField.ID_TELEGRAM.value]
     )
-
-    if len(result) == 0:
+    if len(result) == 0 or result[0][0] is not None:
         return False
 
     await execute(
