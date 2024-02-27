@@ -5,8 +5,7 @@ from aiogram.filters import Filter
 
 from database.database_config import database_name, table_workers
 from enums.database_field import DatabaseField
-from utils.sql.execute import execute
-from utils.sql.select import select
+from utils import sql
 
 
 class IsWorker(Filter):
@@ -22,7 +21,7 @@ class IsWorker(Filter):
             if await found_from_database(
                     f"{DatabaseField.USER_NAME.value} = ?",
                     message.from_user.username):
-                await execute(
+                await sql.execute(
                     database_name,
                     f"UPDATE {table_workers} SET "
                     f"{DatabaseField.ID_TELEGRAM.value} = ?"
@@ -34,7 +33,7 @@ class IsWorker(Filter):
 
 
 async def found_from_database(condition: str, parameter: Any):
-    result = await select(
+    result = await sql.select(
         database_name,
         table_workers,
         condition,

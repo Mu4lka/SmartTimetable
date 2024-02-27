@@ -7,8 +7,8 @@ from UI.data_buttons import admin_buttons
 from UI.make_text_parameters import make_text_parameters
 from UI.show_main_menu import show_main_menu
 from enums.other_button import OtherButton
-from utils.generate_key import generate_key
-from utils.sql.insert import insert
+from utils import generate_key
+from utils import sql
 from enums.database_field import DatabaseField
 from enums.main_menu import AdminButton
 from filters.is_admin import IsAdmin
@@ -90,7 +90,7 @@ async def add_worker_in_database(message: types.Message, state: FSMContext):
     await state.update_data({DatabaseField.KEY.value: await generate_key(constants.KEY_LENGTH)})
     user_data = await state.get_data()
 
-    await insert(database_name, table_workers, user_data)
+    await sql.insert(database_name, table_workers, user_data)
     await message.answer(
         constants.ABOUT_CREATING_WORKER +
         await make_text_parameters(constants.descriptions_worker_parameters, user_data) +

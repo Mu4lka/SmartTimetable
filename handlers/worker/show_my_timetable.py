@@ -14,7 +14,7 @@ from enums.other_button import OtherButton
 from filters.is_worker import IsWorker
 import google_sheets
 from handlers.worker.change_shift import ShiftChange
-from utils.sql.select import select
+from utils import sql
 
 router = Router()
 
@@ -41,7 +41,7 @@ async def show_my_timetable(callback_query: types.CallbackQuery, state: FSMConte
 
 
 async def get_name(user_id: int):
-    result = await select(
+    result = await sql.select(
         database_name,
         table_workers,
         f"{DatabaseField.ID_TELEGRAM.value} = ?",

@@ -1,4 +1,4 @@
-from utils.get_config import get_config
+from utils import get_config
 
 config_file_name = "config.json"
 config = get_config(config_file_name)

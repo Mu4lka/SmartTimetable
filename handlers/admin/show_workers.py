@@ -12,10 +12,8 @@ from enums.database_field import DatabaseField
 from enums.main_menu import AdminButton
 from enums.button_worker_setting import ButtonWorkerSetting
 from filters.is_admin import IsAdmin
-from utils.generate_key import generate_key
-from utils.sql.delete import delete
-from utils.sql.execute import execute
-from utils.sql.select import select
+from utils import generate_key
+from utils import sql
 
 
 class ActionOnWorker(StatesGroup):
@@ -28,7 +26,7 @@ router = Router()
 
 @router.callback_query(StateFilter(None), IsAdmin(), F.data == AdminButton.SHOW_WORKERS.value)
 async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
-    result = await select(
+    result = await sql.select(
         database_name,
         table_workers,
         columns=[DatabaseField.FULL_NAME.value, DatabaseField.ID.value]
@@ -70,7 +68,7 @@ async def take_worker_id(callback_query: types.CallbackQuery, state: FSMContext)
 async def delete_worker(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
 
-    await delete(
+    await sql.delete(
         database_name,
         table_workers,
         f"{DatabaseField.ID.value} = ?",
@@ -90,7 +88,7 @@ async def delete_worker(callback_query: types.CallbackQuery, state: FSMContext):
 async def restore_access(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     key = await generate_key(constants.KEY_LENGTH)
-    await execute(
+    await sql.execute(
         database_name,
         f"UPDATE {table_workers} SET "
         f"{DatabaseField.ID_TELEGRAM.value} = ?,"
@@ -112,7 +110,7 @@ async def restore_access(callback_query: types.CallbackQuery, state: FSMContext)
 )
 async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    worker = await select(
+    worker = await sql.select(
         database_name,
         table_workers,
         f"{DatabaseField.ID.value} = ?",

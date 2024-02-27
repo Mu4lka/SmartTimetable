@@ -7,13 +7,13 @@ from handlers import common
 from handlers.admin import create_worker, show_workers, make_timetable
 from handlers.worker import change_shift, make_my_timetable, show_my_timetable
 from loader import dispatcher, bot
-from utils.set_bot_commands import set_default_commands
-from utils.notify_admins import on_startup_notify
+from utils import set_default_commands
+from utils import on_startup_notify
 
 
-async def on_startup(_bot: Bot):
-    await set_default_commands(_bot)
-    await on_startup_notify(_bot)
+async def on_startup(bot: Bot):
+    await set_default_commands(bot)
+    await on_startup_notify(bot)
 
 
 def include_routers():
