@@ -1,19 +1,18 @@
-from aiogram import F, Router, types
+
+from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from UI.data_buttons import admin_buttons, worker_settings_buttons
-from UI.make_inline_keyboard import make_inline_keyboard
-from UI.show_main_menu import show_main_menu
+from UI.buttons.data_buttons import admin_buttons, worker_settings_buttons
+from UI.buttons.enums import ButtonWorkerSetting
+from UI.buttons.enums.main_menu import AdminButton
+from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
-from database.database_config import table_workers, database_name
-from enums.database_field import DatabaseField
-from enums.main_menu import AdminButton
-from enums.button_worker_setting import ButtonWorkerSetting
-from filters.is_admin import IsAdmin
-from utils import generate_key
-from utils import sql
+from database.database_config import database_name, table_workers
+from database.enums import DatabaseField
+from filters import IsAdmin
+from utils import sql, generate_key
 
 
 class ActionOnWorker(StatesGroup):

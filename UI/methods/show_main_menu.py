@@ -1,7 +1,6 @@
 from aiogram import types
 
-from UI.get_buttons import get_buttons
-from UI.make_inline_keyboard import make_inline_keyboard
+from UI.methods import get_buttons, make_inline_keyboard
 from data import constants
 
 

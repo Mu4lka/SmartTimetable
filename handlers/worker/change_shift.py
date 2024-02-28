@@ -1,12 +1,13 @@
-from aiogram import F, Router, types
+from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from UI.data_buttons import worker_buttons
-from UI.show_main_menu import show_main_menu
-from enums.other_button import OtherButton
-from filters.is_worker import IsWorker
+from UI.buttons.data_buttons import worker_buttons
+from UI.buttons.enums import OtherButton
+from UI.methods import show_main_menu
+from filters import IsWorker
+
 
 router = Router()
 

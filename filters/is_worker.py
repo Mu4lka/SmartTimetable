@@ -1,10 +1,9 @@
-from typing import Any
-
 from aiogram import types
 from aiogram.filters import Filter
 
 from database.database_config import database_name, table_workers
-from enums.database_field import DatabaseField
+from database.enums import DatabaseField
+from database.methods import found_from_database
 from utils import sql
 
 
@@ -30,13 +29,3 @@ class IsWorker(Filter):
                 )
                 return True
         return False
-
-
-async def found_from_database(condition: str, parameter: Any):
-    result = await sql.select(
-        database_name,
-        table_workers,
-        condition,
-        parameter
-    )
-    return not len(result) == 0

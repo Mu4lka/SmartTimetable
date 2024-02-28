@@ -1,17 +1,16 @@
-from aiogram import types, Router, F
-from aiogram.filters import Command, StateFilter
+from aiogram import F, types, Router
+from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
-from UI.get_buttons import get_buttons
-from UI.show_main_menu import show_main_menu
+from UI.buttons.enums import OtherButton
+from UI.buttons.enums.main_menu import BaseButton
+from UI.methods import show_main_menu, get_buttons, make_keyboard
 from data import constants
 from data.config import LINK_TO_TIMETABLE
-from database.check_key import check_key
-from enums.main_menu import Button, BaseButton
-from filters.is_authorized import IsAuthorized
-from filters.is_private import IsPrivate
-from UI.make_keyboard import make_keyboard
+from database.methods import check_key
+from filters import IsAuthorized, IsPrivate
+
 
 router = Router()
 
@@ -22,7 +21,7 @@ async def show_timetable(callback_query: types.CallbackQuery):
     await show_main_menu(callback_query.message, user_id=callback_query.from_user.id)
 
 
-@router.message(IsPrivate(), IsAuthorized(), F.text == Button.CANCEL.value)
+@router.message(IsPrivate(), IsAuthorized(), F.text == OtherButton.CANCEL.value)
 async def command_cancel(message: types.Message, state: FSMContext):
     await message.answer(constants.CANCEL)
     await show_main_menu(message)
@@ -42,7 +41,7 @@ async def command_start(message: types.Message, state: FSMContext):
 
     await message.answer(
         f"Привет {message.from_user.first_name}",
-        reply_markup=await make_keyboard([Button.CANCEL.value])
+        reply_markup=await make_keyboard([OtherButton.CANCEL.value])
     )
     await show_main_menu(message, buttons)
 

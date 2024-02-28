@@ -1,8 +1,7 @@
 from aiogram import types
 from aiogram.filters import Filter
 
-from filters.is_admin import IsAdmin
-from filters.is_worker import IsWorker
+from filters import IsAdmin, IsWorker
 
 
 class IsAuthorized(Filter):

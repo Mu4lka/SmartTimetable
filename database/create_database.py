@@ -1,7 +1,7 @@
 import sqlite3
 
 from database.database_config import database_name, table_workers
-from enums.database_field import DatabaseField
+from database.enums import DatabaseField
 
 
 def create_database():

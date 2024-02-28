@@ -1,10 +1,6 @@
 from enum import Enum
 
 
-class Button(str, Enum):
-    CANCEL = "Отмена"
-
-
 class BaseButton(str, Enum):
     SHOW_TIMETABLE = "Показать расписание"
 

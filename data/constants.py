@@ -1,4 +1,4 @@
-from enums.database_field import DatabaseField
+from database.enums import DatabaseField
 
 DAY_START = 0
 DAY_END = 24

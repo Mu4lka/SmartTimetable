@@ -1,8 +1,7 @@
 from aiogram import types
 
-from UI.data_buttons import admin_buttons, worker_buttons
-from filters.is_admin import IsAdmin
-from filters.is_worker import IsWorker
+from UI.buttons.data_buttons import admin_buttons, worker_buttons
+from filters import IsAdmin, IsWorker
 
 
 async def get_buttons(message: types.Message, user_id: int = None):

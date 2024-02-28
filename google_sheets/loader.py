@@ -10,4 +10,4 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name(
     ['https://www.googleapis.com/auth/spreadsheets',
      'https://www.googleapis.com/auth/drive'])
 http_auth = credentials.authorize(httplib2.Http())
-service = discovery.build('sheets', 'v4', http=http_auth)
+service = discovery.build('sheets', 'v4', http=http_auth)\

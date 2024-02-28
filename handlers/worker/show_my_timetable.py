@@ -1,20 +1,20 @@
-from aiogram import F, Router, types
+from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from UI.data_buttons import worker_buttons
-from UI.make_inline_keyboard import make_inline_keyboard
-from UI.show_main_menu import show_main_menu
+import google_sheets
+from UI.buttons.data_buttons import worker_buttons
+from UI.buttons.enums import OtherButton
+from UI.buttons.enums.main_menu import WorkerButton
+from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
 from data.config import SPREADSHEET_ID
 from database.database_config import database_name, table_workers
-from enums.database_field import DatabaseField
-from enums.main_menu import WorkerButton
-from enums.other_button import OtherButton
-from filters.is_worker import IsWorker
-import google_sheets
+from database.enums import DatabaseField
+from filters import IsWorker
 from handlers.worker.change_shift import ShiftChange
 from utils import sql
+
 
 router = Router()
 
