@@ -9,6 +9,9 @@ KEY_LENGTH = 12
 MIN_NUMBER_HOURS = 0
 MAX_NUMBER_HOURS = 98
 
+MIN_NUMBER_WEEKEND = 0
+MAX_NUMBER_WEEKEND = 7
+
 START_BOT = "Бот запущен"
 SELECT_COMMAND = "Выберите команду..."
 CANCEL = "Отменено"
@@ -17,7 +20,8 @@ ABOUT_NOT_AUTHORIZED = "Введите ключ для авторизации в
 
 ENTER_FULL_NAME = ("Создание сотрудника...\nВведите полное имя (ИФ)...\n\n"
                    "Важно!!! Полное имя (ИФ) должно совпадать с расписанием")
-ENTER_NUMBER_HOURS = "Введите недельную норму часов"
+ENTER_NUMBER_HOURS = "Введите количество часов в неделю"
+ENTER_NUMBER_WEEKEND = "Введите количество выходных"
 ENTER_USER_NAME = (f"(Не обязательно)\nВведите пользовательское имя...\n"
                    f"Например: имя_пользователя, @имя_пользователя или https://t.me/имя_пользователя")
 ABOUT_CREATING_WORKER = "Вы создали сотрудника! Его параметры:\n\n"
@@ -27,6 +31,10 @@ ABOUT_SENDING_KEY_TO_WORKER = ("\nP.S. Вы можете отправить кл
 INVALID_NUMBER_HOURS = (f"Число вне диапазона!\n"
                         f"Число должно входить в диапазон от {MIN_NUMBER_HOURS} до {MAX_NUMBER_HOURS}.\n\n"
                         f"Попробуйте ещё раз...")
+
+INVALID_NUMBER_WEEKEND = (f"Число вне диапазона!\n"
+                          f"Число должно входить в диапазон от {MIN_NUMBER_WEEKEND} до {MAX_NUMBER_WEEKEND}.\n\n"
+                          f"Попробуйте ещё раз...")
 
 INVALID_INPUT = "Неверный формат ввода, попробуйте ещё раз..."
 INVALID_REQUEST = "Неактуальный запрос"
@@ -40,14 +48,17 @@ LIMITATION_ON_NUMBER_WORKER = "Ограничение по количеству 
 ACCESS_RESTORED = "Доступ восстановлен. Теперь отправьте новый ключ сотруднику..."
 
 NOT_AVAILABLE_YET = "пока не доступно"
-
-week = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
-week_abbreviated = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+week_english = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+week_russian = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+week_abbreviated = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
 descriptions_worker_parameters = {
     DatabaseField.FULL_NAME.value: 'Имя',
     DatabaseField.USER_NAME.value: 'Пользовательское имя',
     DatabaseField.ID_TELEGRAM.value: 'Айди пользователя',
     DatabaseField.KEY.value: 'Ключ',
-    DatabaseField.NUMBER_HOURS.value: 'Количество часов'
+    DatabaseField.NUMBER_HOURS.value: 'Количество часов',
+    DatabaseField.NUMBER_WEEKEND.value: 'Количество выходных'
 }
+
+query_making_timetable_by_worker = {"approved": None, "week": {}}

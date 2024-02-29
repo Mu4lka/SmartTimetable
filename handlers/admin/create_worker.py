@@ -16,6 +16,7 @@ from utils import generate_key, sql
 class CreatingWorker(StatesGroup):
     full_name = State()
     number_hours = State()
+    number_weekend = State()
     user_name = State()
 
 
@@ -50,25 +51,42 @@ async def take_number_hours(message: types.Message, state: FSMContext):
         number_hours = int(message.text)
         if constants.MIN_NUMBER_HOURS <= number_hours <= constants.MAX_NUMBER_HOURS:
             await state.update_data({DatabaseField.NUMBER_HOURS.value: number_hours})
-            await message.answer(
-                constants.ENTER_USER_NAME,
-                reply_markup=await make_inline_keyboard([OtherButton.SKIP.value])
-            )
-            await state.set_state(CreatingWorker.user_name)
+            await message.answer(constants.ENTER_NUMBER_WEEKEND)
+            await state.set_state(CreatingWorker.number_weekend)
         else:
             await message.answer(constants.INVALID_NUMBER_HOURS)
     except Exception:
         await message.answer(constants.INVALID_INPUT)
 
 
-@router.message(IsAdmin(), StateFilter(CreatingWorker.user_name))
-async def take_user_name(message: types.Message, state: FSMContext):
-    message_text = message.text
+@router.message(IsAdmin(), StateFilter(CreatingWorker.number_weekend))
+async def take_number_weekend(message: types.Message, state: FSMContext):
     if message.text is None:
         await message.answer(constants.INVALID_INPUT)
         return
 
-    user_name = message_text.strip("@")
+    try:
+        number_weekend = int(message.text)
+        if constants.MIN_NUMBER_WEEKEND <= number_weekend <= constants.MAX_NUMBER_WEEKEND:
+            await state.update_data({DatabaseField.NUMBER_WEEKEND.value: number_weekend})
+            await message.answer(
+                constants.ENTER_USER_NAME,
+                reply_markup=await make_inline_keyboard([OtherButton.SKIP.value])
+            )
+            await state.set_state(CreatingWorker.user_name)
+        else:
+            await message.answer(constants.INVALID_NUMBER_WEEKEND)
+    except Exception:
+        await message.answer(constants.INVALID_INPUT)
+
+
+@router.message(IsAdmin(), StateFilter(CreatingWorker.user_name))
+async def take_user_name(message: types.Message, state: FSMContext):
+    if message.text is None:
+        await message.answer(constants.INVALID_INPUT)
+        return
+
+    user_name = message.text.strip("@")
     telegram_link = "https://t.me/"
     if telegram_link in user_name:
         user_name = user_name.rsplit(telegram_link, 1)[1]

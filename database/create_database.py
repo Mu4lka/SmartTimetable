@@ -14,7 +14,8 @@ def create_database():
         {DatabaseField.USER_NAME.value} TEXT,
         {DatabaseField.ID_TELEGRAM.value} INTEGER,
         {DatabaseField.KEY.value} TEXT,
-        {DatabaseField.NUMBER_HOURS.value} INTEGER)'''
+        {DatabaseField.NUMBER_HOURS.value} INTEGER,
+        {DatabaseField.NUMBER_WEEKEND.value} INTEGER)'''
     )
     connection.commit()
     connection.close()

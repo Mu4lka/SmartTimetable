@@ -8,3 +8,4 @@ class DatabaseField(str, Enum):
     ID_TELEGRAM = "id_telegram"
     KEY = "key"
     NUMBER_HOURS = "number_hours"
+    NUMBER_WEEKEND = "number_weekend"
