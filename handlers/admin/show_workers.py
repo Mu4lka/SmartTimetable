@@ -34,10 +34,8 @@ async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
         await callback_query.message.edit_text(constants.NO_WORKERS)
         await show_main_menu(callback_query.message, admin_buttons)
         return
-    print(result)
-    workers = {}
-    for worker in result:
-        workers.update({str(worker[0]): str(worker[1])})
+
+    workers = {str(full_name): str(worker_id) for full_name, worker_id in result}
 
     await callback_query.message.edit_text(
         constants.LIST_WORKERS,

@@ -61,4 +61,12 @@ descriptions_worker_parameters = {
     DatabaseField.NUMBER_WEEKEND.value: 'Количество выходных'
 }
 
-query_making_timetable_by_worker = {"approved": None, "week": {}}
+MESSAGE_USING_TEMPLATE = ("Отправьте расписание используя шаблон:\n\n"
+                          "пн: 8:00-18:00\n"
+                          "вт: 09:30-18:30\n"
+                          "ср: 10:00-18:00\n"
+                          "чт: 10:00-18:30\n"
+                          "пт: 10:00-18:00\n"
+                          "сб: вых\n"
+                          "вс: вых\n\n"
+                          )
