@@ -1,7 +1,14 @@
 from data import constants
 
-hours = {f"{index}:00": f"{index}" for index in range(constants.DAY_END + 1)}
-hours_first_zero = {f"0{index}:00": f"{index}" for index in range(10)}
-half_hours = {f"{index}:30": f"{index}.5" for index in range(constants.DAY_END)}
-half_hours_first_zero = {f"0{index}:0": f"{index}" for index in range(10)}
-day_off = {"вых": 0.0}
+
+def make_dial(count: int, accuracy: str = "00", zeroing: int = ""):
+    value = 0
+    if accuracy == "30":
+        value = 5
+    return {f"{zeroing}{index}:{accuracy}": f"{index}.{value}" for index in range(count)}
+
+
+hours = make_dial(constants.DAY_END + 1)
+hours_first_zero = make_dial(10, zeroing=0)
+half_hours = make_dial(constants.DAY_END, "30")
+half_hours_first_zero = make_dial(10, "30", 0)

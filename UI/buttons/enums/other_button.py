@@ -6,3 +6,5 @@ class OtherButton(str, Enum):
     CHANGE_SHIFT = "Поменять смену"
     SKIP = "Пропустить"
     BEGIN = "Начать"
+    CHANGE = "Изменить"
+    SEND_TIMETABLE = "Отправить расписание"

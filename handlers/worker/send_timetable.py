@@ -17,7 +17,8 @@ router = Router()
 
 class SendingTimetableByWorker(StatesGroup):
     begin = State()
-    take_timetable = State()
+    timetable = State()
+    apply = State()
 
 
 @router.callback_query(
@@ -25,7 +26,7 @@ class SendingTimetableByWorker(StatesGroup):
     IsWorker(),
     F.data == WorkerButton.SEND_MY_TIMETABLE.value
 )
-async def sending_timetable(callback_query: types.CallbackQuery, state: FSMContext):
+async def start_sending_timetable(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.edit_text(
         "Чтобы отправить расписание, нужно его составить",
         reply_markup=await make_inline_keyboard([OtherButton.BEGIN.value]))
@@ -39,11 +40,11 @@ async def sending_timetable(callback_query: types.CallbackQuery, state: FSMConte
 )
 async def show_template(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.edit_text(constants.MESSAGE_USING_TEMPLATE)
-    await state.set_state(SendingTimetableByWorker.take_timetable)
+    await state.set_state(SendingTimetableByWorker.timetable)
 
 
 @router.message(
-    StateFilter(SendingTimetableByWorker.take_timetable),
+    StateFilter(SendingTimetableByWorker.timetable),
     IsWorker()
 )
 async def take_template(message: types.Message, state: FSMContext):
@@ -55,15 +56,28 @@ async def take_template(message: types.Message, state: FSMContext):
         number_hours = await get_number_hours(timetable)
         number_weekend = list(timetable.values()).count("вых")
         await check_timetable(timetable, number_hours, min_number_hours, number_weekend, min_number_weekend)
-        print(timetable)
         await message.answer(
             f"Количество часов: {number_hours}\nКоличество выходных: {number_weekend}\n\n",
-            reply_markup=await make_inline_keyboard(["Отправить расписание", "Изменить"])
+            reply_markup=await make_inline_keyboard(
+                [OtherButton.SEND_TIMETABLE.value, OtherButton.CHANGE.value]
+            )
         )
-        await show_main_menu(message)
-        await state.clear()
+        print(sort_timetable(timetable))
+        await state.update_data(timetable=await sort_timetable(timetable))
+        await state.set_state(SendingTimetableByWorker.apply)
     except Exception as error:
         await message.answer(str(error))
+
+
+@router.callback_query(
+    StateFilter(SendingTimetableByWorker.apply),
+    IsWorker()
+)
+async def send_timetable(callback_query: types.CallbackQuery, state: FSMContext):
+    if callback_query.data == OtherButton.CHANGE.value:
+        await show_template(callback_query, state)
+    elif callback_query.data == OtherButton.SEND_TIMETABLE.value:
+        pass
 
 
 async def get_timetable(lines: list):
@@ -77,6 +91,11 @@ async def get_timetable(lines: list):
             raise ValueError(constants.INVALID_INPUT)
         timetable.update({day: shift[1]})
     return timetable
+
+
+async def sort_timetable(timetable: dict):
+    sorted_timetable = {day: None for day in constants.week_abbreviated}
+    return sorted_timetable.update(timetable)
 
 
 async def get_number_hours(timetable: dict):
@@ -94,8 +113,7 @@ async def get_shift_duration(shift: str, full_dial: dict):
     if shift == "вых":
         return 0.0
 
-    time = shift.split("-", 1)
-    time_start, time_end = time
+    time_start, time_end = shift.split("-", 1)
     time_start_value = float(full_dial.get(time_start))
     time_end_value = float(full_dial.get(time_end))
     return (time_start_value >= time_end_value) * constants.DAY_END - (time_start_value - time_end_value)
@@ -114,11 +132,12 @@ async def check_timetable(
     if number_hours < min_number_hours:
         raise ValueError(
             f"Количество часов за неделю меньше, чем задано!\n"
-            f"Должно не меньше {min_number_hours}. Пришло: {number_hours}. попробуйте ещё раз..."
+            f"Должно не меньше {min_number_hours}. Всего: {number_hours}. попробуйте ещё раз..."
         )
 
     if number_weekend > min_number_weekend:
         raise ValueError(
             "Количество выходных в неделю больше, чем задано!\n"
-            f"Должно быть не больше {min_number_weekend}. Пришло: {number_weekend}. попробуйте ещё раз..."
+            f"Должно быть не больше {min_number_weekend}. Всего: {number_weekend}. попробуйте ещё раз..."
         )
+    
