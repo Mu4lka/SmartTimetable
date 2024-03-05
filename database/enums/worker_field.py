@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class DatabaseField(str, Enum):
+class WorkerField(str, Enum):
     ID = "id"
     FULL_NAME = "full_name"
     USER_NAME = "user_name"

@@ -1,14 +1,15 @@
 from data import constants
 
 
-def make_dial(count: int, accuracy: str = "00", zeroing: int = ""):
-    value = 0
-    if accuracy == "30":
-        value = 5
-    return {f"{zeroing}{index}:{accuracy}": f"{index}.{value}" for index in range(count)}
+def make_dial(hours: int, is_half_hours: bool = False, zeroing: bool = False):
+    zero = ""
+    if zeroing:
+        zero = "0"
+    return {f"{zero}{hour}:{3 * is_half_hours}0": f"{hour + 0.5 * is_half_hours}" for hour in range(hours)}
 
 
 hours = make_dial(constants.DAY_END + 1)
-hours_first_zero = make_dial(10, zeroing=0)
-half_hours = make_dial(constants.DAY_END, "30")
-half_hours_first_zero = make_dial(10, "30", 0)
+zeroing_hours = make_dial(10, zeroing=True)
+half_hours = make_dial(constants.DAY_END, True)
+zeroing_half_hours = make_dial(10, True, True)
+full_dial = {**hours, **half_hours, **zeroing_hours, **zeroing_half_hours}

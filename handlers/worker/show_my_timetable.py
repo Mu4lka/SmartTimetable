@@ -10,7 +10,7 @@ from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
 from data.config import SPREADSHEET_ID
 from database.database_config import database_name, table_workers
-from database.enums import DatabaseField
+from database.enums import WorkerField
 from filters import IsWorker
 from handlers.worker.change_shift import ShiftChange
 from utils import sql
@@ -44,9 +44,9 @@ async def get_name(user_id: int):
     result = await sql.select(
         database_name,
         table_workers,
-        f"{DatabaseField.ID_TELEGRAM.value} = ?",
+        f"{WorkerField.ID_TELEGRAM.value} = ?",
         user_id,
-        [DatabaseField.FULL_NAME.value]
+        [WorkerField.FULL_NAME.value]
     )
     return result[0][0]
 

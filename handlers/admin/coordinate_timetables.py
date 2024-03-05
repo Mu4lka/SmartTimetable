@@ -12,9 +12,9 @@ from filters import IsAdmin
 router = Router()
 
 
-@router.callback_query(StateFilter(None), IsAdmin(), F.data == AdminButton.MAKE_TIMETABLE.value)
-async def generate_timetable(callback_query: types.CallbackQuery, state: FSMContext):
+@router.callback_query(StateFilter(None), IsAdmin(), F.data == AdminButton.COORDINATE_TIMETABLES.value)
+async def coordinate_timetables(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.edit_text(
-        f"Команда \"{AdminButton.MAKE_TIMETABLE.value}\" {constants.NOT_AVAILABLE_YET}"
+        f"Команда \"{AdminButton.COORDINATE_TIMETABLES.value}\" {constants.NOT_AVAILABLE_YET}"
     )
     await show_main_menu(callback_query.message, admin_buttons)

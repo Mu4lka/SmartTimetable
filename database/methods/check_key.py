@@ -1,5 +1,5 @@
 from database.database_config import database_name, table_workers
-from database.enums import DatabaseField
+from database.enums import WorkerField
 from utils import sql
 
 
@@ -7,9 +7,9 @@ async def check_key(key: str, user_id: int, user_name: str):
     result = await sql.select(
         database_name,
         table_workers,
-        f"{DatabaseField.KEY.value}= ?",
+        f"{WorkerField.KEY.value}= ?",
         key,
-        columns=[DatabaseField.ID_TELEGRAM.value]
+        columns=[WorkerField.ID_TELEGRAM.value]
     )
     if len(result) == 0 or result[0][0] is not None:
         return False
@@ -17,9 +17,9 @@ async def check_key(key: str, user_id: int, user_name: str):
     await sql.execute(
         database_name,
         f"UPDATE {table_workers} SET "
-        f"{DatabaseField.ID_TELEGRAM.value} = ?,"
-        f"{DatabaseField.USER_NAME.value} = ?"
-        f"WHERE {DatabaseField.KEY.value} = ?",
+        f"{WorkerField.ID_TELEGRAM.value} = ?,"
+        f"{WorkerField.USER_NAME.value} = ?"
+        f"WHERE {WorkerField.KEY.value} = ?",
         (user_id, user_name, key,)
     )
     return True

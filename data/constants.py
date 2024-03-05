@@ -1,4 +1,4 @@
-from database.enums import DatabaseField
+from database.enums import WorkerField
 
 DAY_START = 0
 DAY_END = 24
@@ -53,20 +53,19 @@ week_russian = ["Понедельник", "Вторник", "Среда", "Че�
 week_abbreviated = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
 descriptions_worker_parameters = {
-    DatabaseField.FULL_NAME.value: 'Имя',
-    DatabaseField.USER_NAME.value: 'Пользовательское имя',
-    DatabaseField.ID_TELEGRAM.value: 'Айди пользователя',
-    DatabaseField.KEY.value: 'Ключ',
-    DatabaseField.NUMBER_HOURS.value: 'Количество часов',
-    DatabaseField.NUMBER_WEEKEND.value: 'Количество выходных'
+    WorkerField.FULL_NAME.value: 'Имя',
+    WorkerField.USER_NAME.value: 'Пользовательское имя',
+    WorkerField.ID_TELEGRAM.value: 'Айди пользователя',
+    WorkerField.KEY.value: 'Ключ',
+    WorkerField.NUMBER_HOURS.value: 'Количество часов',
+    WorkerField.NUMBER_WEEKEND.value: 'Количество выходных'
 }
 
-MESSAGE_USING_TEMPLATE = ("Отправьте расписание используя шаблон:\n\n"
+MESSAGE_USING_TEMPLATE = ("Отправьте расписание используя шаблон. Пример шаблона:\n\n"
                           "пн: 8:00-18:00\n"
                           "вт: 09:30-18:30\n"
                           "ср: 10:00-18:00\n"
                           "чт: 10:00-18:30\n"
                           "пт: 10:00-18:00\n"
                           "сб: вых\n"
-                          "вс: вых\n\n"
-                          )
+                          "вс: вых\n\n")

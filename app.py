@@ -2,7 +2,7 @@ import asyncio
 
 from aiogram import Bot
 
-from database.create_database import create_database
+from database.methods import create_database
 from handlers import common, admin, worker
 from loader import bot, dispatcher
 from utils import set_default_commands, on_startup_notify
