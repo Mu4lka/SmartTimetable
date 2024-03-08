@@ -8,3 +8,5 @@ class OtherButton(str, Enum):
     BEGIN = "Начать"
     CHANGE = "Изменить"
     SEND_TIMETABLE = "Отправить расписание"
+    ACCEPT = "Принять"
+    REJECT = "Отклонить"

@@ -2,12 +2,11 @@ from database.enums import WorkerField
 
 DAY_START = 0
 DAY_END = 24
-MIN_SHIFT_DURATION = 1
-MAX_SHIFT_DURATION = 14
+MAX_SHIFT_DURATION = 20
 KEY_LENGTH = 12
 
 MIN_NUMBER_HOURS = 0
-MAX_NUMBER_HOURS = 98
+MAX_NUMBER_HOURS = 7*MAX_SHIFT_DURATION
 
 MIN_NUMBER_WEEKEND = 0
 MAX_NUMBER_WEEKEND = 7
@@ -18,6 +17,7 @@ CANCEL = "Отменено"
 
 ABOUT_NOT_AUTHORIZED = "Введите ключ для авторизации вашего аккаунта"
 
+# Creation worker
 ENTER_FULL_NAME = ("Создание сотрудника...\nВведите полное имя (ИФ)...\n\n"
                    "Важно!!! Полное имя (ИФ) должно совпадать с расписанием")
 ENTER_NUMBER_HOURS = "Введите количество часов в неделю"
@@ -39,12 +39,12 @@ INVALID_NUMBER_WEEKEND = (f"Число вне диапазона!\n"
 INVALID_INPUT = "Неверный формат ввода, попробуйте ещё раз..."
 INVALID_REQUEST = "Неактуальный запрос"
 
+# Edit worker
 LIST_WORKERS = "Список сотрудников. Выберите сотрудника чтобы его настроить"
 WORKER_SETTINGS = "Настройки сотрудника. Выберите команду..."
 PARAMETERS_WORKER = "Параметры сотрудника. Выберите параметр, который нужно изменить"
 NO_WORKERS = "Нет сотрудников"
 REMOVE_WORKER = "Вы удалили сотрудника"
-LIMITATION_ON_NUMBER_WORKER = "Ограничение по количеству сотрудников"
 ACCESS_RESTORED = "Доступ восстановлен. Теперь отправьте новый ключ сотруднику..."
 
 NOT_AVAILABLE_YET = "пока не доступно"
@@ -55,17 +55,17 @@ week_abbreviated = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 descriptions_worker_parameters = {
     WorkerField.FULL_NAME.value: 'Имя',
     WorkerField.USER_NAME.value: 'Пользовательское имя',
-    WorkerField.ID_TELEGRAM.value: 'Айди пользователя',
+    WorkerField.USER_ID.value: 'Айди пользователя',
     WorkerField.KEY.value: 'Ключ',
     WorkerField.NUMBER_HOURS.value: 'Количество часов',
     WorkerField.NUMBER_WEEKEND.value: 'Количество выходных'
 }
-
+day_off = "вых"
 MESSAGE_USING_TEMPLATE = ("Отправьте расписание используя шаблон. Пример шаблона:\n\n"
                           "пн: 8:00-18:00\n"
                           "вт: 09:30-18:30\n"
                           "ср: 10:00-18:00\n"
                           "чт: 10:00-18:30\n"
                           "пт: 10:00-18:00\n"
-                          "сб: вых\n"
-                          "вс: вых\n\n")
+                          f"сб: {day_off}\n"
+                          f"вс: {day_off}\n\n")

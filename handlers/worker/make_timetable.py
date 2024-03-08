@@ -13,6 +13,7 @@ from data import constants
 from database.database_config import database_name, table_workers, table_queries
 from database.enums import WorkerField, QueryField
 from database.enums.query_field import QueryType
+from database.methods import found_from_database
 from filters import IsWorker
 from utils import sql
 
@@ -29,11 +30,26 @@ class SendingTimetableByWorker(StatesGroup):
     IsWorker(),
     F.data == WorkerButton.SEND_MY_TIMETABLE.value
 )
+async def start_sending_timetable(callback_query: types.CallbackQuery, state: FSMContext):
+    if await found_from_database(
+            table_queries,
+            f"{WorkerField.USER_ID.value} = ?",
+            callback_query.from_user.id):
+        await callback_query.message.edit_text(
+            "Вы не можете отправить расписание, так как уже его отправили!"
+            "\nОжидайте подтверждение руководителя..."
+        )
+        await show_main_menu(callback_query.message, user_id=callback_query.from_user.id)
+        return
+    else:
+        await show_template(callback_query, state)
+
+
 async def show_template(callback_query: types.CallbackQuery, state: FSMContext):
     result = await sql.select(
         database_name,
         table_workers,
-        f"{WorkerField.ID_TELEGRAM.value} = ?",
+        f"{WorkerField.USER_ID.value} = ?",
         callback_query.from_user.id,
         [f"{WorkerField.NUMBER_HOURS.value}", f"{WorkerField.NUMBER_WEEKEND.value}"]
     )
@@ -54,7 +70,7 @@ async def show_template(callback_query: types.CallbackQuery, state: FSMContext):
     StateFilter(SendingTimetableByWorker.timetable),
     IsWorker()
 )
-async def take_template(message: types.Message, state: FSMContext):
+async def take_timetable(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     min_number_hours = user_data["min_number_hours"]
     max_number_weekend = user_data["max_number_weekend"]
@@ -62,7 +78,7 @@ async def take_template(message: types.Message, state: FSMContext):
     try:
         timetable = await get_timetable(message.text.split("\n"))
         number_hours = await get_number_hours(timetable)
-        number_weekend = list(timetable.values()).count("вых")
+        number_weekend = list(timetable.values()).count(constants.day_off)
         await check_timetable(timetable, number_hours, min_number_hours, number_weekend, max_number_weekend)
         await message.answer(
             f"Количество часов: {number_hours}\nКоличество выходных: {number_weekend}\n\n",
@@ -86,8 +102,8 @@ async def insert_timetable_in_database(callback_query: types.CallbackQuery, stat
     elif callback_query.data == OtherButton.SEND_TIMETABLE.value:
         user_data = await state.get_data()
         query = {
-            f"{QueryField.ID_TELEGRAM.value}": callback_query.from_user.id,
-            f"{QueryField.TYPE.value}": QueryType.SENDING_TIMETABLE_BY_WORKER.value,
+            f"{QueryField.USER_ID.value}": callback_query.from_user.id,
+            f"{QueryField.TYPE.value}": QueryType.MAKING_TIMETABLE_BY_WORKER.value,
             f"{QueryField.QUERY_TEXT.value}": json.dumps(user_data["timetable"]),
         }
         await sql.insert(database_name, table_queries, query)
@@ -126,7 +142,7 @@ async def get_number_hours(timetable: dict):
 
 
 async def get_shift_duration(shift: str):
-    if shift == "вых":
+    if shift == constants.day_off:
         return 0.0
 
     time_start, time_end = shift.split("-", 1)

@@ -88,7 +88,7 @@ async def restore_access(callback_query: types.CallbackQuery, state: FSMContext)
     await sql.execute(
         database_name,
         f"UPDATE {table_workers} SET "
-        f"{WorkerField.ID_TELEGRAM.value} = ?,"
+        f"{WorkerField.USER_ID.value} = ?,"
         f"{WorkerField.USER_NAME.value} = ?,"
         f"{WorkerField.KEY.value} = ?"
         f"WHERE {WorkerField.ID.value} = ?",

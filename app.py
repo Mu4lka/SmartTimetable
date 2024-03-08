@@ -3,7 +3,7 @@ import asyncio
 from aiogram import Bot
 
 from database.methods import create_database
-from handlers import common, admin, worker
+from handlers import common, admin, worker, error
 from loader import bot, dispatcher
 from utils import set_default_commands, on_startup_notify
 
@@ -16,7 +16,7 @@ async def on_startup(bot: Bot):
 async def main():
     create_database()
     await on_startup(bot)
-    dispatcher.include_routers(common.router, admin.router, worker.router)
+    dispatcher.include_routers(error.router, common.router, admin.router, worker.router)
     await dispatcher.start_polling(bot)
 
 

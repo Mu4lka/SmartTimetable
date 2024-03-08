@@ -13,17 +13,19 @@ class IsWorker(Filter):
             user_id = message.from_user.id
 
         if await found_from_database(
-                f"{WorkerField.ID_TELEGRAM.value} = ?",
+                table_workers,
+                f"{WorkerField.USER_ID.value} = ?",
                 user_id):
             return True
         else:
             if await found_from_database(
+                    table_workers,
                     f"{WorkerField.USER_NAME.value} = ?",
                     message.from_user.username):
                 await sql.execute(
                     database_name,
                     f"UPDATE {table_workers} SET "
-                    f"{WorkerField.ID_TELEGRAM.value} = ?"
+                    f"{WorkerField.USER_ID.value} = ?"
                     f"WHERE {WorkerField.USER_NAME.value} = ?",
                     (user_id, message.from_user.username)
                 )

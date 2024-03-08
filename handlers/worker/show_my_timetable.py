@@ -44,7 +44,7 @@ async def get_name(user_id: int):
     result = await sql.select(
         database_name,
         table_workers,
-        f"{WorkerField.ID_TELEGRAM.value} = ?",
+        f"{WorkerField.USER_ID.value} = ?",
         user_id,
         [WorkerField.FULL_NAME.value]
     )

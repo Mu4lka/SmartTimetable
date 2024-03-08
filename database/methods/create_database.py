@@ -12,7 +12,7 @@ def create_database():
         {WorkerField.ID.value} INTEGER PRIMARY KEY AUTOINCREMENT,
         {WorkerField.FULL_NAME.value} TEXT,
         {WorkerField.USER_NAME.value} TEXT,
-        {WorkerField.ID_TELEGRAM.value} INTEGER,
+        {WorkerField.USER_ID.value} INTEGER,
         {WorkerField.KEY.value} TEXT,
         {WorkerField.NUMBER_HOURS.value} INTEGER,
         {WorkerField.NUMBER_WEEKEND.value} INTEGER)'''
@@ -20,7 +20,7 @@ def create_database():
     cursor.execute(
         f'''CREATE TABLE IF NOT EXISTS {table_queries}(
             {QueryField.ID.value} INTEGER PRIMARY KEY AUTOINCREMENT,
-            {QueryField.ID_TELEGRAM.value} INTEGER,
+            {QueryField.USER_ID.value} INTEGER,
             {QueryField.TYPE.value} TEXT,
             {QueryField.QUERY_TEXT.value} TEXT)'''
     )
