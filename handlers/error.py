@@ -8,4 +8,5 @@ router = Router()
 
 # @router.error()
 # async def error_handler(event: ErrorEvent):
-#     print(event.exception)
+#     with open("errors.txt", "w") as file:
+#         file.write(str(event))

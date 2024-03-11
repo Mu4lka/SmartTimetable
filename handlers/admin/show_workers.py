@@ -9,8 +9,8 @@ from UI.buttons.enums import ButtonWorkerSetting
 from UI.buttons.enums.main_menu import AdminButton
 from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
-from database.database_config import database_name, table_workers
-from database.enums import WorkerField
+from database.database_config import database_name, table_workers, table_queries
+from database.enums import WorkerField, QueryField
 from filters import IsAdmin
 from utils import sql, generate_key
 
@@ -35,7 +35,7 @@ async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
         await show_main_menu(callback_query.message, admin_buttons)
         return
 
-    workers = {str(full_name): str(worker_id) for full_name, worker_id in result}
+    workers = dict(result)
 
     await callback_query.message.edit_text(
         constants.LIST_WORKERS,
@@ -47,7 +47,7 @@ async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
 @router.callback_query(StateFilter(ActionOnWorker.worker_id), IsAdmin())
 async def take_worker_id(callback_query: types.CallbackQuery, state: FSMContext):
     try:
-        await state.update_data(id=int(callback_query.data))
+        await state.update_data({WorkerField.ID.value: int(callback_query.data)})
     except Exception:
         return
     await callback_query.message.edit_text(
@@ -57,21 +57,30 @@ async def take_worker_id(callback_query: types.CallbackQuery, state: FSMContext)
     await state.set_state(ActionOnWorker.setting)
 
 
+async def delete_worker_queries(worker_id):
+    await sql.delete(
+        database_name,
+        table_queries,
+        f"{QueryField.ID.value} = ?",
+        (worker_id,)
+    )
+
+
 @router.callback_query(
     StateFilter(ActionOnWorker.setting),
     IsAdmin(),
     F.data == ButtonWorkerSetting.DELETE_WORKER.value
 )
-async def delete_worker(callback_query: types.CallbackQuery, state: FSMContext):
+async def delete_worker_and_his_queries(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-
+    worker_id = user_data[WorkerField.ID.value]
     await sql.delete(
         database_name,
         table_workers,
         f"{WorkerField.ID.value} = ?",
-        user_data[WorkerField.ID.value]
+        (worker_id,)
     )
-
+    await delete_worker_queries(worker_id)
     await callback_query.message.edit_text(constants.REMOVE_WORKER)
     await show_main_menu(callback_query.message, admin_buttons)
     await state.clear()
@@ -88,14 +97,14 @@ async def restore_access(callback_query: types.CallbackQuery, state: FSMContext)
     await sql.execute(
         database_name,
         f"UPDATE {table_workers} SET "
-        f"{WorkerField.USER_ID.value} = ?,"
+        f"{WorkerField.TELEGRAM_ID.value} = ?,"
         f"{WorkerField.USER_NAME.value} = ?,"
         f"{WorkerField.KEY.value} = ?"
         f"WHERE {WorkerField.ID.value} = ?",
         (None, None, key, user_data[WorkerField.ID.value],)
     )
 
-    await callback_query.message.answer(f"{constants.ACCESS_RESTORED}\n\nКлюч: {key}")
+    await callback_query.message.edit_text(f"{constants.ACCESS_RESTORED}\n\nКлюч: {key}")
     await show_main_menu(callback_query.message, admin_buttons)
     await state.clear()
 
@@ -111,7 +120,7 @@ async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext
         database_name,
         table_workers,
         f"{WorkerField.ID.value} = ?",
-        user_data[WorkerField.ID.value]
+        (user_data[WorkerField.ID.value],)
     )
     print(list(worker[0]))
     await callback_query.message.answer(f"Редактирование параметров. Параметры")

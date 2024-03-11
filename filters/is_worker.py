@@ -14,20 +14,17 @@ class IsWorker(Filter):
 
         if await found_from_database(
                 table_workers,
-                f"{WorkerField.USER_ID.value} = ?",
-                user_id):
+                f"{WorkerField.TELEGRAM_ID.value} = ? OR {WorkerField.USER_NAME.value} = ?",
+                (user_id, message.from_user.username)):
+            if message.from_user.is_bot:
+                raise ValueError("Данные принадлежат сущности 'Бот'")
+            await sql.execute(
+                database_name,
+                f"UPDATE {table_workers} SET "
+                f"{WorkerField.TELEGRAM_ID.value} = ?,"
+                f"{WorkerField.USER_NAME.value} = ?"
+                f"WHERE {WorkerField.TELEGRAM_ID.value} = ? OR {WorkerField.USER_NAME.value} = ?",
+                (user_id, message.from_user.username, user_id, message.from_user.username,)
+            )
             return True
-        else:
-            if await found_from_database(
-                    table_workers,
-                    f"{WorkerField.USER_NAME.value} = ?",
-                    message.from_user.username):
-                await sql.execute(
-                    database_name,
-                    f"UPDATE {table_workers} SET "
-                    f"{WorkerField.USER_ID.value} = ?"
-                    f"WHERE {WorkerField.USER_NAME.value} = ?",
-                    (user_id, message.from_user.username)
-                )
-                return True
         return False

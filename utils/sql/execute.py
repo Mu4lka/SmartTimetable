@@ -1,9 +1,13 @@
 import sqlite3
 
 
-async def execute(database_name: str, sql: str, parameters: tuple = None):
-    connection = sqlite3.connect(f"{database_name}.db")
+async def execute(database: str, sql: str, parameters: tuple = None):
+    connection = sqlite3.connect(f"{database}.db")
     cursor = connection.cursor()
-    cursor.execute(sql, parameters)
-    connection.commit()
-    connection.close()
+    if parameters is None:
+        cursor.execute(sql)
+    else:
+        cursor.execute(sql, parameters)
+        connection.commit()
+    cursor.close()
+    return cursor

@@ -14,7 +14,7 @@ async def on_startup(bot: Bot):
 
 
 async def main():
-    create_database()
+    await create_database()
     await on_startup(bot)
     dispatcher.include_routers(error.router, common.router, admin.router, worker.router)
     await dispatcher.start_polling(bot)

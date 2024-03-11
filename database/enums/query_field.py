@@ -2,11 +2,12 @@ from enum import Enum
 
 
 class QueryField(str, Enum):
-    ID = "id"
-    USER_ID = "user_id"
-    TYPE = "type"
+    ID = "query_id"
+    WORKER_ID = "worker_id"
+    TYPE = "query_type"
     QUERY_TEXT = "query_text"
 
 
 class QueryType(str, Enum):
-    MAKING_TIMETABLE_BY_WORKER = "making_timetable_by_worker"
+    SENDING_TIMETABLE = "sending_timetable"
+    CHANGING_SHIFT = "changing_shift"

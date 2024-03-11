@@ -6,7 +6,7 @@ MAX_SHIFT_DURATION = 20
 KEY_LENGTH = 12
 
 MIN_NUMBER_HOURS = 0
-MAX_NUMBER_HOURS = 7*MAX_SHIFT_DURATION
+MAX_NUMBER_HOURS = 7 * MAX_SHIFT_DURATION
 
 MIN_NUMBER_WEEKEND = 0
 MAX_NUMBER_WEEKEND = 7
@@ -39,7 +39,7 @@ INVALID_NUMBER_WEEKEND = (f"Число вне диапазона!\n"
 INVALID_INPUT = "Неверный формат ввода, попробуйте ещё раз..."
 INVALID_REQUEST = "Неактуальный запрос"
 
-# Edit worker
+# Edition worker
 LIST_WORKERS = "Список сотрудников. Выберите сотрудника чтобы его настроить"
 WORKER_SETTINGS = "Настройки сотрудника. Выберите команду..."
 PARAMETERS_WORKER = "Параметры сотрудника. Выберите параметр, который нужно изменить"
@@ -47,25 +47,36 @@ NO_WORKERS = "Нет сотрудников"
 REMOVE_WORKER = "Вы удалили сотрудника"
 ACCESS_RESTORED = "Доступ восстановлен. Теперь отправьте новый ключ сотруднику..."
 
+# making timetable
+INVALID_ABOUT_MORE_THAN_ONE_SCHEDULE = "Вы не можете отправить более одного расписания, ожидайте подтверждения..."
+INVALID_TIMETABLE = "Неверный формат расписания, попробуйте еще раз..."
+
 NOT_AVAILABLE_YET = "пока не доступно"
+
+NEW_TIMETABLE = "Новое расписание"
+
 week_english = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 week_russian = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
 week_abbreviated = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
+format_timetable = ["Сотрудник"] + week_russian + ["Общие часы (ч)"]
+
 descriptions_worker_parameters = {
-    WorkerField.FULL_NAME.value: 'Имя',
-    WorkerField.USER_NAME.value: 'Пользовательское имя',
-    WorkerField.USER_ID.value: 'Айди пользователя',
-    WorkerField.KEY.value: 'Ключ',
-    WorkerField.NUMBER_HOURS.value: 'Количество часов',
-    WorkerField.NUMBER_WEEKEND.value: 'Количество выходных'
+    WorkerField.FULL_NAME.value: "Имя",
+    WorkerField.USER_NAME.value: "Пользовательское имя",
+    WorkerField.TELEGRAM_ID.value: "Айди пользователя",
+    WorkerField.KEY.value: "Ключ",
+    WorkerField.NUMBER_HOURS.value: "Количество часов",
+    WorkerField.NUMBER_WEEKEND.value: "Количество выходных"
 }
-day_off = "вых"
-MESSAGE_USING_TEMPLATE = ("Отправьте расписание используя шаблон. Пример шаблона:\n\n"
-                          "пн: 8:00-18:00\n"
-                          "вт: 09:30-18:30\n"
-                          "ср: 10:00-18:00\n"
-                          "чт: 10:00-18:30\n"
-                          "пт: 10:00-18:00\n"
-                          f"сб: {day_off}\n"
-                          f"вс: {day_off}\n\n")
+day_off = "выходной"
+EXAMPLE_TEMPLATE = (
+    "Отправьте расписание используя шаблон. Пример шаблона:\n\n"
+    "пн: 8:00-18:00\n"
+    "вт: 09:30-18:30\n"
+    "ср: 10:00-18:00\n"
+    "чт: 10:00-18:30\n"
+    "пт: 10:00-18:00\n"
+    f"сб: {day_off}\n"
+    f"вс: {day_off}\n\n"
+)

@@ -23,6 +23,17 @@ class CreatingWorker(StatesGroup):
 router = Router()
 
 
+def has_message_text(func):
+    async def wrapper(message: types.Message, state: FSMContext):
+        try:
+            if message.text is None:
+                raise ValueError(constants.INVALID_INPUT)
+            await func(message, state)
+        except Exception as error:
+            await message.answer(str(error))
+    return wrapper
+
+
 @router.callback_query(IsAdmin(), StateFilter(None), F.data == AdminButton.CREATE_WORKER.value)
 async def start_creating_worker(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.delete()
@@ -31,61 +42,49 @@ async def start_creating_worker(callback_query: types.CallbackQuery, state: FSMC
 
 
 @router.message(IsAdmin(), StateFilter(CreatingWorker.full_name))
+@has_message_text
 async def take_full_name(message: types.Message, state: FSMContext):
-    if message.text is None:
-        await message.answer(constants.INVALID_INPUT)
-        return
-
     await state.update_data({WorkerField.FULL_NAME.value: message.text})
     await message.answer(constants.ENTER_NUMBER_HOURS)
     await state.set_state(CreatingWorker.number_hours)
 
 
 @router.message(IsAdmin(), StateFilter(CreatingWorker.number_hours))
+@has_message_text
 async def take_number_hours(message: types.Message, state: FSMContext):
-    if message.text is None:
-        await message.answer(constants.INVALID_INPUT)
-        return
-
     try:
         number_hours = int(message.text)
-        if constants.MIN_NUMBER_HOURS <= number_hours <= constants.MAX_NUMBER_HOURS:
-            await state.update_data({WorkerField.NUMBER_HOURS.value: number_hours})
-            await message.answer(constants.ENTER_NUMBER_WEEKEND)
-            await state.set_state(CreatingWorker.number_weekend)
-        else:
-            await message.answer(constants.INVALID_NUMBER_HOURS)
     except Exception:
-        await message.answer(constants.INVALID_INPUT)
+        raise ValueError(constants.INVALID_INPUT)
+    if constants.MIN_NUMBER_HOURS <= number_hours <= constants.MAX_NUMBER_HOURS:
+        await state.update_data({WorkerField.NUMBER_HOURS.value: number_hours})
+        await message.answer(constants.ENTER_NUMBER_WEEKEND)
+        await state.set_state(CreatingWorker.number_weekend)
+    else:
+        await message.answer(constants.INVALID_NUMBER_HOURS)
 
 
 @router.message(IsAdmin(), StateFilter(CreatingWorker.number_weekend))
+@has_message_text
 async def take_number_weekend(message: types.Message, state: FSMContext):
-    if message.text is None:
-        await message.answer(constants.INVALID_INPUT)
-        return
-
     try:
         number_weekend = int(message.text)
-        if constants.MIN_NUMBER_WEEKEND <= number_weekend <= constants.MAX_NUMBER_WEEKEND:
-            await state.update_data({WorkerField.NUMBER_WEEKEND.value: number_weekend})
-            await message.answer(
-                constants.ENTER_USER_NAME,
-                reply_markup=await make_inline_keyboard([OtherButton.SKIP.value])
-            )
-            await state.set_state(CreatingWorker.user_name)
-        else:
-            await message.answer(constants.INVALID_NUMBER_WEEKEND)
     except Exception:
-        await message.answer(constants.INVALID_INPUT)
+        raise ValueError(constants.INVALID_INPUT)
+    if constants.MIN_NUMBER_WEEKEND <= number_weekend <= constants.MAX_NUMBER_WEEKEND:
+        await state.update_data({WorkerField.NUMBER_WEEKEND.value: number_weekend})
+        await message.answer(
+            constants.ENTER_USER_NAME,
+            reply_markup=await make_inline_keyboard([OtherButton.SKIP.value])
+        )
+        await state.set_state(CreatingWorker.user_name)
+    else:
+        raise ValueError(constants.INVALID_NUMBER_WEEKEND)
 
 
 @router.message(IsAdmin(), StateFilter(CreatingWorker.user_name))
+@has_message_text
 async def take_user_name(message: types.Message, state: FSMContext):
-    if message.text is None:
-        await message.answer(constants.INVALID_INPUT)
-        return
-
     user_name = message.text.strip("@")
     telegram_link = "https://t.me/"
     if telegram_link in user_name:
@@ -96,6 +95,7 @@ async def take_user_name(message: types.Message, state: FSMContext):
 
 @router.callback_query(IsAdmin(), StateFilter(CreatingWorker.user_name), F.data == OtherButton.SKIP.value)
 async def create_worker(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.message.delete()
     await add_worker_in_database(callback_query.message, state)
 
 
