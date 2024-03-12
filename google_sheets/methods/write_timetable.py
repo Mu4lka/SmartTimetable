@@ -1,9 +1,9 @@
 from typing import Any
 
-from data.config import SPREADSHEET_ID
 from database.database_config import database_name, table_workers
 from database.enums import QueryField, WorkerField
-from google_sheets import service
+from google_sheets.loader import spreadsheets
+from utils.google_sheets.enums import Dimension
 from handlers.worker.send_timetable import calculate_number_of_hours
 from utils import sql
 
@@ -28,14 +28,8 @@ async def write_timetable(sheet_name: str, timetable: dict, user_data: Any):
             + list(timetable.values()) +
             [await calculate_number_of_hours(timetable)]
     )
-    service.spreadsheets().values().batchUpdate(
-        spreadsheetId=SPREADSHEET_ID,
-        body={
-            "valueInputOption": "USER_ENTERED",
-            "data": {
-                "range": f"{sheet_name}!A{number_row}:I{number_row}",
-                "majorDimension": "ROWS",
-                "values": [values, ]
-            }
-        }
-    ).execute()
+    await spreadsheets.write_batch_update_values(
+        f"{sheet_name}!A{number_row}:I{number_row}",
+        Dimension.ROWS,
+        [values, ]
+    )

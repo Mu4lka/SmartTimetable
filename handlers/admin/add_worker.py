@@ -34,8 +34,8 @@ def has_message_text(func):
     return wrapper
 
 
-@router.callback_query(IsAdmin(), StateFilter(None), F.data == AdminButton.CREATE_WORKER.value)
-async def start_creating_worker(callback_query: types.CallbackQuery, state: FSMContext):
+@router.callback_query(IsAdmin(), StateFilter(None), F.data == AdminButton.ADD_WORKER.value)
+async def start_add_worker(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.delete()
     await callback_query.message.answer(constants.ENTER_FULL_NAME)
     await state.set_state(CreatingWorker.full_name)
@@ -90,16 +90,16 @@ async def take_user_name(message: types.Message, state: FSMContext):
     if telegram_link in user_name:
         user_name = user_name.rsplit(telegram_link, 1)[1]
     await state.update_data({WorkerField.USER_NAME.value: user_name})
-    await add_worker_in_database(message, state)
+    await add_worker(message, state)
 
 
 @router.callback_query(IsAdmin(), StateFilter(CreatingWorker.user_name), F.data == OtherButton.SKIP.value)
 async def create_worker(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.delete()
-    await add_worker_in_database(callback_query.message, state)
+    await add_worker(callback_query.message, state)
 
 
-async def add_worker_in_database(message: types.Message, state: FSMContext):
+async def add_worker(message: types.Message, state: FSMContext):
     from database.database_config import database_name, table_workers
 
     await state.update_data({WorkerField.KEY.value: await generate_key(constants.KEY_LENGTH)})
@@ -107,7 +107,7 @@ async def add_worker_in_database(message: types.Message, state: FSMContext):
 
     await sql.insert(database_name, table_workers, user_data)
     await message.answer(
-        constants.ABOUT_CREATING_WORKER +
+        constants.ABOUT_ADDING_WORKER +
         await make_text_parameters(constants.descriptions_worker_parameters, user_data) +
         constants.ABOUT_SENDING_KEY_TO_WORKER
     )

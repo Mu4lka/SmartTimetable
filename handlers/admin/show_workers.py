@@ -61,7 +61,7 @@ async def delete_worker_queries(worker_id):
     await sql.delete(
         database_name,
         table_queries,
-        f"{QueryField.ID.value} = ?",
+        f"{QueryField.WORKER_ID.value} = ?",
         (worker_id,)
     )
 

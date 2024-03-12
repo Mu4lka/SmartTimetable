@@ -1,28 +1,18 @@
 from data import constants
-from data.config import SPREADSHEET_ID
-from google_sheets import service
+from google_sheets.loader import spreadsheets
+from utils.google_sheets.enums import Dimension
 
 
 async def create_new_timetable(name_sheet):
-    service.spreadsheets().batchUpdate(
-        spreadsheetId=SPREADSHEET_ID,
-        body={
-            "requests": [{
-                "addSheet": {
-                    "properties": {
-                        "title": name_sheet
-                    }
-                }
-            },]
-        }).execute()
-    service.spreadsheets().values().batchUpdate(
-        spreadsheetId=SPREADSHEET_ID,
-        body={
-            "valueInputOption": "USER_ENTERED",
-            "data": {
-                "range": f"{name_sheet}!A1:I1",
-                "majorDimension": "ROWS",
-                "values": [constants.format_timetable, ]
+    await spreadsheets.update([{
+        "addSheet": {
+            "properties": {
+                "title": name_sheet
             }
         }
-    ).execute()
+    },])
+    await spreadsheets.write_batch_update_values(
+        f"{name_sheet}!A1:I1",
+        Dimension.ROWS,
+        [constants.format_timetable,]
+    )

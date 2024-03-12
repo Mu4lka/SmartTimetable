@@ -6,7 +6,7 @@ class BaseButton(str, Enum):
 
 
 class AdminButton(str, Enum):
-    CREATE_WORKER = "Создать сотрудника"
+    ADD_WORKER = "Добавить сотрудника"
     SHOW_WORKERS = "Показать сотрудников"
     COORDINATE_TIMETABLES = "Согласование расписаний"
 

@@ -1,1 +1,1 @@
-from .loader import service
+from .loader import spreadsheets
