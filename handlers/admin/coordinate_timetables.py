@@ -82,7 +82,6 @@ async def get_worker_data(worker_id: int):
 @router.message(StateFilter(CoordinationTimetables.coordination), IsAdmin())
 async def show_next_timetable(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
-    print(user_data)
     queries = user_data["queries"]
     if await has_pending_queries(queries, message, state):
         query_data = await extract_query_data(queries)

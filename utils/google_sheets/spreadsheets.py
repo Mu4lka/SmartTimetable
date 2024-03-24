@@ -6,7 +6,7 @@ from apiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 
 from utils.google_sheets.enums import Dimension
-from utils.google_sheets.methods import write_batch_update_values, get_values, update_spreadsheets
+from utils.google_sheets.methods import batch_update_values, get_values, update_spreadsheets
 
 
 class Spreadsheets:
@@ -36,7 +36,7 @@ class Spreadsheets:
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(
             None,
-            write_batch_update_values,
+            batch_update_values,
             self.spreadsheets,
             self.__spreadsheet_id,
             sheet_range,

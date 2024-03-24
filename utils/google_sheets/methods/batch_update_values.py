@@ -3,7 +3,7 @@ from typing import Any
 from utils.google_sheets.enums import Dimension
 
 
-def write_batch_update_values(
+def batch_update_values(
         spreadsheets: Any,
         spreadsheet_id: str,
         sheet_range: str,

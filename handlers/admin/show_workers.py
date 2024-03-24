@@ -12,12 +12,13 @@ from data import constants
 from database.database_config import database_name, table_workers, table_queries
 from database.enums import WorkerField, QueryField
 from filters import IsAdmin
-from utils import sql, generate_key
+from utils import sql, generate_key, make_form
 
 
 class ActionOnWorker(StatesGroup):
     worker_id = State()
     setting = State()
+    edition = State()
 
 
 router = Router()
@@ -48,8 +49,8 @@ async def show_workers(callback_query: types.CallbackQuery, state: FSMContext):
 async def take_worker_id(callback_query: types.CallbackQuery, state: FSMContext):
     try:
         await state.update_data({WorkerField.ID.value: int(callback_query.data)})
-    except Exception:
-        return
+    except Exception as error:
+        print(error)
     await callback_query.message.edit_text(
         constants.WORKER_SETTINGS,
         reply_markup=await make_inline_keyboard(worker_settings_buttons)
@@ -89,9 +90,9 @@ async def delete_worker_and_his_queries(callback_query: types.CallbackQuery, sta
 @router.callback_query(
     StateFilter(ActionOnWorker.setting),
     IsAdmin(),
-    F.data == ButtonWorkerSetting.RESTORE_ACCESS.value
+    F.data == ButtonWorkerSetting.RESET_USER.value
 )
-async def restore_access(callback_query: types.CallbackQuery, state: FSMContext):
+async def reset_user(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     key = await generate_key(constants.KEY_LENGTH)
     await sql.execute(
@@ -104,9 +105,21 @@ async def restore_access(callback_query: types.CallbackQuery, state: FSMContext)
         (None, None, key, user_data[WorkerField.ID.value],)
     )
 
-    await callback_query.message.edit_text(f"{constants.ACCESS_RESTORED}\n\nКлюч: {key}")
+    await callback_query.message.edit_text(f"{constants.RESET_USER_DATA}\n\nКлюч: {key}")
     await show_main_menu(callback_query.message, admin_buttons)
     await state.clear()
+
+
+async def make_keyboard_for_parameters_edition():
+    parameters = [
+        WorkerField.FULL_NAME.value,
+        WorkerField.NUMBER_HOURS.value,
+        WorkerField.NUMBER_WEEKEND.value
+    ]
+    buttons = {}
+    for parameter in parameters:
+        buttons.update({constants.descriptions_worker_parameters[parameter]: parameter})
+    return await make_inline_keyboard(buttons)
 
 
 @router.callback_query(
@@ -120,9 +133,20 @@ async def edit_parameters(callback_query: types.CallbackQuery, state: FSMContext
         database_name,
         table_workers,
         f"{WorkerField.ID.value} = ?",
-        (user_data[WorkerField.ID.value],)
+        (user_data[WorkerField.ID.value],),
+        list(constants.descriptions_worker_parameters.keys())
     )
-    print(list(worker[0]))
-    await callback_query.message.answer(f"Редактирование параметров. Параметры")
-    await show_main_menu(callback_query.message, admin_buttons)
-    await state.clear()
+
+    form_parameters = await make_form(
+        dict(zip(constants.descriptions_worker_parameters.values(), worker[0])))
+
+    await callback_query.message.edit_text(
+        f"Параметры:\n\n{form_parameters}\n\nВыберите параметр для редактирования:",
+        reply_markup=await make_keyboard_for_parameters_edition()
+    )
+    await state.set_state(ActionOnWorker.edition)
+
+
+@router.callback_query(StateFilter(ActionOnWorker.edition), IsAdmin())
+async def edit_parameter(callback_query: types.CallbackQuery, state: FSMContext):
+    pass

@@ -27,9 +27,9 @@ async def show_timetable(callback_query: types.CallbackQuery):
     await show_main_menu(callback_query.message, worker_buttons)
 
 
-@router.message(IsPrivate(), IsAuthorized(), F.text == OtherButton.CANCEL.value)
-async def command_cancel(message: types.Message, state: FSMContext):
-    await message.answer(constants.CANCEL)
+@router.message(IsPrivate(), IsAuthorized(), F.text == OtherButton.MAIN_MENU.value)
+async def command_main_menu(message: types.Message, state: FSMContext):
+    await message.delete()
     await show_main_menu(message, user_id=message.from_user.id)
     await state.clear()
 
@@ -47,7 +47,7 @@ async def command_start(message: types.Message, state: FSMContext):
 
     await message.answer(
         f"Привет {message.from_user.first_name}",
-        reply_markup=await make_keyboard([OtherButton.CANCEL.value])
+        reply_markup=await make_keyboard([OtherButton.MAIN_MENU.value])
     )
     await show_main_menu(message, buttons)
 

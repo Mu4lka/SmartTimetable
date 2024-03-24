@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class OtherButton(str, Enum):
-    CANCEL = "Отмена"
+    MAIN_MENU = "Главное меню"
     CHANGE_SHIFT = "Поменять смену"
     SKIP = "Пропустить"
     BEGIN = "Начать"
