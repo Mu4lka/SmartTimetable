@@ -32,7 +32,9 @@ async def show_worker_timetable(callback_query: types.CallbackQuery, state: FSMC
         return
     shifts = await get_shifts(row)
     await callback_query.message.edit_text(
-        await make_form(dict(zip(constants.week_abbreviated, shifts)))
+        "Ваше расписание:\n\n"
+        f"<pre>{await make_form(dict(zip(constants.week_abbreviated, shifts)))}</pre>",
+        parse_mode="HTML"
     )
     await show_main_menu(callback_query.message, worker_buttons)
 

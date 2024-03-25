@@ -2,6 +2,6 @@ from enum import Enum
 
 
 class ButtonWorkerSetting(str, Enum):
-    EDIT_PARAMETERS = "Редактировать параметры"
-    RESET_USER = "Сбросить пользователя"
+    CHANGE_PARAMETER = "Изменить параметр"
+    RESET_USER = "Сброс пользователя"
     DELETE_WORKER = "Удалить сотрудника"

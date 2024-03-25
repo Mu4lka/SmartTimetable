@@ -44,8 +44,10 @@ async def get_data_for_sending_timetable(user_id: int):
 async def send_template(callback_query: types.CallbackQuery, number_hours: int, number_weekend: int):
     await callback_query.message.edit_text(
         f"{constants.EXAMPLE_TEMPLATE}"
-        f"Ваше количество часов на неделю: {number_hours}\n"
-        f"Ваше количество выходных: {number_weekend}"
+        "<b>Внимание, ваши условия</b>!\n"
+        f"Минимальное количество часов на неделю: {number_hours}\n"
+        f"Максимальное количество выходных: {number_weekend}",
+        parse_mode="HTML"
     )
 
 

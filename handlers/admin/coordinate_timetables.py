@@ -96,14 +96,15 @@ async def show_next_timetable(message: types.Message, state: FSMContext):
             await make_form_for_coordination_timetable(
                 json.loads(query_data[QueryField.QUERY_TEXT.value]),
                 full_name),
-            reply_markup=await make_inline_keyboard([OtherButton.REJECT.value, OtherButton.ACCEPT.value])
+            reply_markup=await make_inline_keyboard([OtherButton.REJECT.value, OtherButton.ACCEPT.value]),
+            parse_mode="HTML"
         )
         await state.set_state(CoordinationTimetables.coordination)
 
 
 async def make_form_for_coordination_timetable(timetable: dict, full_name: str):
     form = await make_form(timetable)
-    return f"Расписание сотрудника {full_name}:\n\n{form}"
+    return f"Расписание сотрудника {full_name}:\n\n<pre>{form}</pre>"
 
 
 @router.callback_query(

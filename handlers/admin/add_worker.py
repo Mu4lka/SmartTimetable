@@ -37,7 +37,7 @@ def has_message_text(func):
 @router.callback_query(IsAdmin(), StateFilter(None), F.data == AdminButton.ADD_WORKER.value)
 async def start_add_worker(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.delete()
-    await callback_query.message.answer(constants.ENTER_FULL_NAME)
+    await callback_query.message.answer(constants.ADDING_WORKER + constants.ENTER_FULL_NAME)
     await state.set_state(CreatingWorker.full_name)
 
 
@@ -56,12 +56,13 @@ async def take_number_hours(message: types.Message, state: FSMContext):
         number_hours = int(message.text)
     except Exception:
         raise ValueError(constants.INVALID_INPUT)
+
     if constants.MIN_NUMBER_HOURS <= number_hours <= constants.MAX_NUMBER_HOURS:
         await state.update_data({WorkerField.NUMBER_HOURS.value: number_hours})
         await message.answer(constants.ENTER_NUMBER_WEEKEND)
         await state.set_state(CreatingWorker.number_weekend)
     else:
-        await message.answer(constants.INVALID_NUMBER_HOURS)
+        raise ValueError(constants.INVALID_NUMBER_HOURS)
 
 
 @router.message(IsAdmin(), StateFilter(CreatingWorker.number_weekend))
@@ -71,6 +72,7 @@ async def take_number_weekend(message: types.Message, state: FSMContext):
         number_weekend = int(message.text)
     except Exception:
         raise ValueError(constants.INVALID_INPUT)
+
     if constants.MIN_NUMBER_WEEKEND <= number_weekend <= constants.MAX_NUMBER_WEEKEND:
         await state.update_data({WorkerField.NUMBER_WEEKEND.value: number_weekend})
         await message.answer(
