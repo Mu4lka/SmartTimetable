@@ -28,7 +28,7 @@ async def write_timetable(sheet_name: str, timetable: dict, user_data: Any):
             + list(timetable.values()) +
             [await calculate_number_of_hours(timetable)]
     )
-    await spreadsheets.write_batch_update_values(
+    await spreadsheets.batch_update_values(
         f"{sheet_name}!A{number_row}:I{number_row}",
         Dimension.ROWS,
         [values, ]
