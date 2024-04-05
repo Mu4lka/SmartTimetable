@@ -5,8 +5,8 @@ from database.enums import WorkerField
 from google_sheets.methods import get_timetable
 from utils import sql
 from utils.google_sheets.enums import Dimension
-from utils.notify_workers.notify_workers_about_changes import notify_about_changes_in_timetable
-from utils.notify_workers.notify_workers_about_shift_start import notify_about_shift_start
+from utils.notify_workers.notify_about_changes_in_timetable import notify_about_changes_in_timetable
+from utils.notify_workers.notify_about_shift_start import notify_about_shift_start
 
 
 async def get_workers():
