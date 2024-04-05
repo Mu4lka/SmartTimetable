@@ -6,6 +6,7 @@ from database.methods import create_database
 from handlers import common, admin, worker, error
 from loader import bot, dispatcher
 from utils import set_default_commands, on_startup_notify
+from utils.notify_workers import start_notify_workers
 
 
 async def on_startup(bot: Bot):
@@ -14,6 +15,7 @@ async def on_startup(bot: Bot):
 
 
 async def main():
+    await start_notify_workers()
     await create_database()
     await on_startup(bot)
     dispatcher.include_routers(error.router, common.router, admin.router, worker.router)

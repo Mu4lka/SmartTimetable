@@ -1,4 +1,7 @@
+from UI.buttons.enums.main_menu import BaseButton, WorkerButton, AdminButton
 from database.enums import WorkerField
+
+CREATOR_NAME = "@Mu4lka"
 
 DAY_START = 0
 DAY_END = 24
@@ -16,10 +19,28 @@ MAIN_MENU = "Главное меню"
 
 ABOUT_NOT_AUTHORIZED = "Введите ключ для авторизации вашего аккаунта"
 
+HELP_FOR_WORKER = (
+    "Ваши команды:\n"
+    f"1. <b>{BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
+    f"2. <b>{WorkerButton.SHOW_MY_TIMETABLE.value}</b> - отправит ваше расписание из google-таблицы\n"
+    f"3. <b>{WorkerButton.SEND_MY_TIMETABLE.value}</b> - с помощью нее вы можете отправить расписание на следующую неделю. Руководитель проверит ваше расписание."
+    f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к вашему руководителю")
+
+HELP_FOR_ADMIN = (
+    "Ваши команды:\n"
+    f"1. <b>{BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
+    f"2. <b>{AdminButton.ADD_WORKER.value}</b> - добавление сотрудника в базу данных\n"
+    f"3. <b>{AdminButton.SHOW_WORKERS.value}</b> - показ списка сотрудников, также выбор сотрудника для его дальнейшей настройки."
+    f"4. <b>{AdminButton.COORDINATE_TIMETABLES.value}</b> - отправленные сотрудниками расписания координируете для создания нового расписания на следующую неделю"
+    f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к {CREATOR_NAME}"
+)
+
+HELP_FOR_UNAUTHORIZED = "Вам нужно авторизоваться, чтобы пользоваться ботом. Обратитесь к руководителю."
+
 # Adding worker
 ADDING_WORKER = "Добавление сотрудника..."
 ENTER_FULL_NAME = ("\nВведите полное имя (ИФ)...\n\n"
-                   "Важно!!! Полное имя (ИФ) должно совпадать с расписанием")
+                   "Важно!!! Полное имя (ИФ) в дальнейшем должно совпадать с расписанием в google-таблице")
 ENTER_NUMBER_HOURS = "Введите количество часов в неделю"
 ENTER_NUMBER_WEEKEND = "Введите количество выходных"
 ENTER_USER_NAME = (f"(Не обязательно)\nВведите пользовательское имя...\n"

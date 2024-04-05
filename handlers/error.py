@@ -1,10 +1,10 @@
 import logging
-from pprint import pprint
 
 from aiogram import Router
 
 from aiogram.types import ErrorEvent
 
+from loader import bot
 
 router = Router()
 
@@ -19,4 +19,5 @@ async def error_handler(event: ErrorEvent):
             f"update: {str(event.update)}\n\n"
             f"ErrorText: {str(event.exception)}\n\n\n")
         file.write(text)
+        await bot.send_message(5680705403, f"ErrorText: {str(event.exception)}")
         logging.exception(text)

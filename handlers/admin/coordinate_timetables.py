@@ -1,9 +1,11 @@
+import asyncio
 import json
 
 from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from googleapiclient.errors import HttpError
 
 from UI.buttons.data_buttons import admin_buttons
 from UI.buttons.enums import OtherButton
@@ -13,7 +15,7 @@ from data import constants
 from database.database_config import database_name, table_queries, table_workers
 from database.enums import WorkerField
 from database.enums.query_field import QueryType, QueryField
-from filters import IsAdmin
+from filters import IsAdmin, IsPrivate
 from google_sheets.methods import create_new_timetable, write_timetable
 from loader import bot
 from utils import sql, make_form
@@ -114,12 +116,10 @@ async def make_form_for_coordination_timetable(timetable: dict, full_name: str):
 )
 async def accept_timetable(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    await callback_query.message.edit_text("Вы приняли расписание...")
     timetable: dict = json.loads(user_data["query_data"][QueryField.QUERY_TEXT.value])
     await set_timetable_in_spread_sheet(user_data, timetable)
-
-    user_id = user_data[WorkerField.TELEGRAM_ID.value]
-    await bot.send_message(user_id, f"Ваше расписание принято!")
+    await callback_query.message.edit_text("Вы приняли расписание...")
+    await bot.send_message(user_data[WorkerField.TELEGRAM_ID.value], f"Ваше расписание принято!")
     await delete_query(callback_query.message, state)
 
 
@@ -127,8 +127,12 @@ async def set_timetable_in_spread_sheet(user_data, timetable: dict):
     try:
         await write_timetable(constants.NEW_TIMETABLE, timetable, user_data)
     except Exception as error:
-        await create_new_timetable(constants.NEW_TIMETABLE)
-        await write_timetable(constants.NEW_TIMETABLE, timetable, user_data)
+        await asyncio.sleep(1)
+        try:
+            await create_new_timetable(constants.NEW_TIMETABLE)
+        except Exception as error:
+            print(isinstance(error, HttpError))
+        await set_timetable_in_spread_sheet(user_data, timetable)
 
 
 @router.callback_query(
@@ -142,6 +146,7 @@ async def reject_timetable(callback_query: types.CallbackQuery, state: FSMContex
 
 
 @router.message(
+    IsPrivate(),
     StateFilter(CoordinationTimetables.rejection),
     IsAdmin()
 )

@@ -10,7 +10,7 @@ from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
 from database.database_config import database_name, table_workers, table_queries
 from database.enums import WorkerField, QueryField
-from filters import IsAdmin
+from filters import IsAdmin, IsPrivate
 from handlers.admin.add_worker import has_message_text
 from utils import sql, generate_key, make_form
 
@@ -175,14 +175,14 @@ async def send_reply_message(callback_query: types.CallbackQuery, state: FSMCont
         return
 
 
-@router.message(IsAdmin(), StateFilter(ActionOnWorker.full_name))
+@router.message(IsPrivate(), IsAdmin(), StateFilter(ActionOnWorker.full_name))
 @has_message_text
 async def take_full_name(message: types.Message, state: FSMContext):
     await state.update_data({"parameter": message.text})
     await update_parameter(message, state)
 
 
-@router.message(IsAdmin(), StateFilter(ActionOnWorker.number_hours))
+@router.message(IsPrivate(), IsAdmin(), StateFilter(ActionOnWorker.number_hours))
 @has_message_text
 async def take_number_hours(message: types.Message, state: FSMContext):
     try:
@@ -197,7 +197,7 @@ async def take_number_hours(message: types.Message, state: FSMContext):
         raise ValueError(constants.INVALID_NUMBER_HOURS)
 
 
-@router.message(IsAdmin(), StateFilter(ActionOnWorker.number_weekend))
+@router.message(IsPrivate(), IsAdmin(), StateFilter(ActionOnWorker.number_weekend))
 @has_message_text
 async def take_number_weekend(message: types.Message, state: FSMContext):
     try:

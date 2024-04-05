@@ -15,7 +15,7 @@ from database.database_config import database_name, table_workers, table_queries
 from database.enums import WorkerField, QueryField
 from database.enums.query_field import QueryType
 from database.methods import found_from_database, get_worker_parameter_by_telegram_id
-from filters import IsWorker
+from filters import IsWorker, IsPrivate
 from utils import sql
 
 router = Router()
@@ -156,6 +156,7 @@ async def sort_timetable(timetable: dict):
 
 
 @router.message(
+    IsPrivate(),
     StateFilter(SendingTimetable.timetable),
     IsWorker()
 )

@@ -9,7 +9,7 @@ from UI.buttons.enums.main_menu import AdminButton
 from UI.methods import make_inline_keyboard, make_text_parameters, show_main_menu
 from data import constants
 from database.enums import WorkerField
-from filters import IsAdmin
+from filters import IsAdmin, IsPrivate
 from utils import generate_key, sql
 
 
@@ -41,7 +41,7 @@ async def start_add_worker(callback_query: types.CallbackQuery, state: FSMContex
     await state.set_state(CreatingWorker.full_name)
 
 
-@router.message(IsAdmin(), StateFilter(CreatingWorker.full_name))
+@router.message(IsPrivate(), IsAdmin(), StateFilter(CreatingWorker.full_name))
 @has_message_text
 async def take_full_name(message: types.Message, state: FSMContext):
     await state.update_data({WorkerField.FULL_NAME.value: message.text})
@@ -49,7 +49,7 @@ async def take_full_name(message: types.Message, state: FSMContext):
     await state.set_state(CreatingWorker.number_hours)
 
 
-@router.message(IsAdmin(), StateFilter(CreatingWorker.number_hours))
+@router.message(IsPrivate(), IsAdmin(), StateFilter(CreatingWorker.number_hours))
 @has_message_text
 async def take_number_hours(message: types.Message, state: FSMContext):
     try:
@@ -65,7 +65,7 @@ async def take_number_hours(message: types.Message, state: FSMContext):
         raise ValueError(constants.INVALID_NUMBER_HOURS)
 
 
-@router.message(IsAdmin(), StateFilter(CreatingWorker.number_weekend))
+@router.message(IsPrivate(), IsAdmin(), StateFilter(CreatingWorker.number_weekend))
 @has_message_text
 async def take_number_weekend(message: types.Message, state: FSMContext):
     try:
@@ -84,7 +84,7 @@ async def take_number_weekend(message: types.Message, state: FSMContext):
         raise ValueError(constants.INVALID_NUMBER_WEEKEND)
 
 
-@router.message(IsAdmin(), StateFilter(CreatingWorker.user_name))
+@router.message(IsPrivate(), IsAdmin(), StateFilter(CreatingWorker.user_name))
 @has_message_text
 async def take_user_name(message: types.Message, state: FSMContext):
     user_name = message.text.strip("@")

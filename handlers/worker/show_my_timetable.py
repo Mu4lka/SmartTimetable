@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
@@ -11,7 +13,7 @@ from database.methods import get_worker_parameter_by_telegram_id
 from filters import IsWorker
 from google_sheets.methods import get_timetable
 from utils import make_form
-
+from utils.google_sheets.enums import Dimension
 
 router = Router()
 
@@ -22,7 +24,7 @@ async def show_worker_timetable(callback_query: types.CallbackQuery, state: FSMC
         callback_query.from_user.id,
         WorkerField.FULL_NAME.value
     )
-    timetable = await get_timetable()
+    timetable = await get_timetable_processing_error(Dimension.ROWS)
     row = await find_row_by_name_from_timetable(timetable, full_name)
     if row is None:
         await callback_query.message.edit_text(
@@ -37,6 +39,14 @@ async def show_worker_timetable(callback_query: types.CallbackQuery, state: FSMC
         parse_mode="HTML"
     )
     await show_main_menu(callback_query.message, worker_buttons)
+
+
+async def get_timetable_processing_error(dimension: Dimension):
+    try:
+        return await get_timetable(dimension)
+    except Exception:
+        await asyncio.sleep(0.2)
+        return await get_timetable_processing_error(dimension)
 
 
 async def find_row_by_name_from_timetable(timetable: list, name: str):

@@ -12,12 +12,13 @@ class IsWorker(Filter):
         if user_id is None:
             user_id = message.from_user.id
 
+        if message.from_user.is_bot:
+            raise ValueError("Данные принадлежат сущности 'Бот'")
+
         if await found_from_database(
                 table_workers,
                 f"{WorkerField.TELEGRAM_ID.value} = ? OR {WorkerField.USER_NAME.value} = ?",
                 (user_id, message.from_user.username)):
-            if message.from_user.is_bot:
-                raise ValueError("Данные принадлежат сущности 'Бот'")
             await sql.execute(
                 database_name,
                 f"UPDATE {table_workers} SET "

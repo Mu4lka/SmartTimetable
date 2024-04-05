@@ -29,7 +29,6 @@ async def show_timetable(callback_query: types.CallbackQuery):
 
 @router.message(IsPrivate(), IsAuthorized(), F.text == OtherButton.MAIN_MENU.value)
 async def command_main_menu(message: types.Message, state: FSMContext):
-    await message.delete()
     await show_main_menu(message, user_id=message.from_user.id)
     await state.clear()
 
@@ -54,15 +53,21 @@ async def command_start(message: types.Message, state: FSMContext):
 
 @router.message(IsPrivate(), Command("help"))
 async def command_help(message: types.Message):
-    await message.answer(f"Нужна помощь?")
+    if await IsAdmin().__call__(message):
+        message_text = constants.HELP_FOR_ADMIN
+    elif await IsWorker().__call__(message):
+        message_text = constants.HELP_FOR_WORKER
+    else:
+        message_text = constants.HELP_FOR_UNAUTHORIZED
+    await message.answer(message_text, parse_mode="HTML")
 
 
 @router.message(IsPrivate(), Command("info_bot"))
 async def command_info_bot(message: types.Message):
-    await message.answer(f"Creator: @Mu4lka")
+    await message.answer(f"Creator: {constants.CREATOR_NAME}\nMade with aiogram")
 
 
-@router.message(StateFilter(None), IsPrivate())
+@router.message(IsPrivate(), StateFilter(None))
 async def take_key(message: types.Message, state: FSMContext):
     if not message.text:
         return
