@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from loader import bot
+from utils.calculate_time_difference import calculate_time_difference, UnitTime
 
 minutes_before_shift_start = 15
 
@@ -9,15 +10,10 @@ def check_time_until_shift_start(shift_start: str, minutes_threshold=15):
     if minutes_threshold < 0:
         raise ValueError("Invalid minute value. The value cannot be negative")
 
-    format = "%H:%M"
-    current_time = datetime.strptime(datetime.now().strftime(format), format)
-    shift_start_time = datetime.strptime(shift_start, format)
-    time_until_shift_start = shift_start_time - current_time
-    minutes_until_shift_start = time_until_shift_start.total_seconds() / 60
-    if minutes_until_shift_start == minutes_threshold:
-        return True
-    else:
-        return False
+    return calculate_time_difference(
+        datetime.now().strftime("%H:%M"),
+        shift_start,
+        UnitTime.MINUTES) == minutes_threshold
 
 
 async def get_shift_starts(timetable: list, workers: dict):

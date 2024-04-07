@@ -5,7 +5,6 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from UI.buttons import dial
 from UI.buttons.data_buttons import worker_buttons
 from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import WorkerButton
@@ -17,6 +16,7 @@ from database.enums.query_field import QueryType
 from database.methods import found_from_database, get_worker_parameter_by_telegram_id
 from filters import IsWorker, IsPrivate
 from utils import sql
+from utils.calculate_time_difference import UnitTime, calculate_time_difference
 
 router = Router()
 
@@ -102,9 +102,12 @@ async def calculate_shift_duration(shift: str):
         return 0.0
 
     time_start_str, time_end_str = shift.split("-", 1)
-    time_start = float(dial.full_dial.get(time_start_str))
-    time_end = float(dial.full_dial.get(time_end_str))
-    return (time_start >= time_end) * constants.DAY_END - (time_start - time_end)
+    shift_duration = calculate_time_difference(time_start_str, time_end_str, UnitTime.HOURS)
+    remainder = shift_duration % 1
+    if remainder == 0.5 or remainder == 0:
+        return calculate_time_difference(time_start_str, time_end_str, UnitTime.HOURS)
+    else:
+        raise Exception()
 
 
 async def calculate_number_of_hours(timetable: dict):

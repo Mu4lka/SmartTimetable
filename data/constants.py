@@ -21,17 +21,20 @@ ABOUT_NOT_AUTHORIZED = "Введите ключ для авторизации в
 
 HELP_FOR_WORKER = (
     "Ваши команды:\n"
-    f"1. <b>{BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
-    f"2. <b>{WorkerButton.SHOW_MY_TIMETABLE.value}</b> - отправит ваше расписание из google-таблицы\n"
-    f"3. <b>{WorkerButton.SEND_MY_TIMETABLE.value}</b> - с помощью нее вы можете отправить расписание на следующую неделю. Руководитель проверит ваше расписание."
+    f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
+    f"<b>2. {WorkerButton.SHOW_MY_TIMETABLE.value}</b> - отправит ваше расписание из google-таблицы\n"
+    f"<b>3. {WorkerButton.SEND_MY_TIMETABLE.value}</b> - "
+    f"с помощью нее вы можете отправить расписание на следующую неделю. Руководитель проверит ваше расписание."
     f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к вашему руководителю")
 
 HELP_FOR_ADMIN = (
     "Ваши команды:\n"
-    f"1. <b>{BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
-    f"2. <b>{AdminButton.ADD_WORKER.value}</b> - добавление сотрудника в базу данных\n"
-    f"3. <b>{AdminButton.SHOW_WORKERS.value}</b> - показ списка сотрудников, также выбор сотрудника для его дальнейшей настройки."
-    f"4. <b>{AdminButton.COORDINATE_TIMETABLES.value}</b> - отправленные сотрудниками расписания координируете для создания нового расписания на следующую неделю"
+    f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
+    f"<b>2. {AdminButton.ADD_WORKER.value}</b> - добавление сотрудника в базу данных\n"
+    f"<b>3. {AdminButton.SHOW_WORKERS.value}</b> - "
+    f"показ списка сотрудников, также выбор сотрудника для его дальнейшей настройки."
+    f"<b>4. {AdminButton.COORDINATE_TIMETABLES.value}</b> - "
+    f"отправленные сотрудниками расписания координируете для создания нового расписания на следующую неделю"
     f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к {CREATOR_NAME}"
 )
 
