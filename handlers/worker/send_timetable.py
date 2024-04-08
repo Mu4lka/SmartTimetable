@@ -15,8 +15,8 @@ from database.enums import WorkerField, QueryField
 from database.enums.query_field import QueryType
 from database.methods import found_from_database, get_worker_parameter_by_telegram_id
 from filters import IsWorker, IsPrivate
-from utils import sql
-from utils.calculate_time_difference import UnitTime, calculate_time_difference
+from utils import sql, calculate_time_difference
+from utils.calculate_time_difference import UnitTime
 
 router = Router()
 
@@ -105,7 +105,7 @@ async def calculate_shift_duration(shift: str):
     shift_duration = calculate_time_difference(time_start_str, time_end_str, UnitTime.HOURS)
     remainder = shift_duration % 1
     if remainder == 0.5 or remainder == 0:
-        return calculate_time_difference(time_start_str, time_end_str, UnitTime.HOURS)
+        return shift_duration
     else:
         raise Exception()
 

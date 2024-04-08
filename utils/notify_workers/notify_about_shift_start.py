@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from loader import bot
-from utils.calculate_time_difference import calculate_time_difference, UnitTime
+from utils.calculate_time_difference import UnitTime, calculate_time_difference
 
 minutes_before_shift_start = 15
 

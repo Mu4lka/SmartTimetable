@@ -9,4 +9,4 @@ async def on_startup_notify(bot: Bot):
         try:
             await bot.send_message(admin_id, START_BOT)
         except Exception as error:
-            print(f"Ошибка: {error}. К сожалению не смог отправить сообщение админу. Айди админа: {admin_id}")
+            print(f"Error: {error}. Unfortunately, I could not send a message to the admin. Admin ID: {admin_id}")

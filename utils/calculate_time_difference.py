@@ -8,8 +8,7 @@ class UnitTime(int, Enum):
     HOURS = 3600
 
 
-def calculate_time_difference(first_time: str, second_time: str, unit_time: UnitTime):
-    format = "%H:%M"
+def calculate_time_difference(first_time: str, second_time: str, unit_time: UnitTime, format: str = "%H:%M"):
     first_time = datetime.strptime(first_time, format)
     second_time = datetime.strptime(second_time, format)
     shift_duration = second_time - first_time
