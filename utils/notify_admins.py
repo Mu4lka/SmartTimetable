@@ -1,5 +1,3 @@
-import logging
-
 from aiogram import Bot
 
 from data.config import ADMIN_IDS

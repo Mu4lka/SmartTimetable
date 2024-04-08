@@ -1,6 +1,14 @@
 from UI.buttons.enums.main_menu import BaseButton, WorkerButton, AdminButton
 from database.enums import WorkerField
 
+config_example = {
+    "bot_token": "токен бота",
+    "admin_ids": [1000000000, 1111111111],
+    "link_to_timetable": "Cсылка на гугл таблицу",
+    "credentials_file": "название файла реквизитов для входа сервисного аккаунта",
+    "spreadsheet_id": "Aйди гугл таблицы"
+}
+
 CREATOR_NAME = "@Mu4lka"
 
 DAY_START = 0

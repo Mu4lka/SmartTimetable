@@ -4,9 +4,11 @@ import sys
 import keyboard
 
 
-def get_config(path: str):
+def get_config(path: str, config_example: dict):
     if not os.path.exists(path):
-        create_config(path)
+        create_config_file(path, config_example)
+        print(f"File {path} was not found, after which it was created,"
+              f"Change the data and restart the application")
         keyboard.read_key()
         sys.exit()
 
@@ -14,15 +16,6 @@ def get_config(path: str):
         return json.load(path)
 
 
-def create_config(path: str):
+def create_config_file(path: str, config_example: dict):
     with open(path, 'w') as config_path:
-        config = {
-            "bot_token": "токен бота",
-            "admin_ids": [1000000000, 1111111111],
-            "link_to_timetable": "Cсылка на гугл таблицу",
-            "credentials_file": "название файла реквизитов для входа сервисного аккаунта",
-            "spreadsheet_id": "Aйди гугл таблицы"
-        }
-        json.dump(config, config_path)
-        print(f"Не нашел файл {path}, в следствии чего он был создан, "
-              f"поменяйте в нем данные и перезапустите приложение")
+        json.dump(config_example, config_path)
