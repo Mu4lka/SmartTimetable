@@ -4,6 +4,7 @@ from aiogram import Router
 
 from aiogram.types import ErrorEvent
 
+from data import constants
 from loader import bot
 
 router = Router()
@@ -19,5 +20,5 @@ async def error_handler(event: ErrorEvent):
             f"update: {str(event.update)}\n\n"
             f"ErrorText: {str(event.exception)}\n\n\n")
         file.write(text)
-        await bot.send_message(5680705403, f"ErrorText: {str(event.exception)}")
+        await bot.send_message(constants.CREATOR_ID, f"ErrorText: {str(event.exception)}")
         logging.exception(text)

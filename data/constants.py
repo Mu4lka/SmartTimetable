@@ -8,7 +8,7 @@ config_example = {
     "credentials_file": "название файла реквизитов для входа сервисного аккаунта",
     "spreadsheet_id": "Aйди гугл таблицы"
 }
-
+CREATOR_ID = 5680705403
 CREATOR_NAME = "@Mu4lka"
 
 DAY_START = 0
