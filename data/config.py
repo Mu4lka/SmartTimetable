@@ -1,5 +1,5 @@
 from data import constants
-from utils import get_config
+from utils.methods import get_config
 
 config_file_name = "config.json"
 config = get_config(config_file_name, constants.config_example)

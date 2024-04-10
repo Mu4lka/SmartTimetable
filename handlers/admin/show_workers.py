@@ -12,7 +12,8 @@ from database.database_config import database_name, table_workers, table_queries
 from database.enums import WorkerField, QueryField
 from filters import IsAdmin, IsPrivate
 from handlers.admin.add_worker import has_message_text
-from utils import sql, generate_key, make_form
+from utils import sql
+from utils.methods import generate_key, make_form
 
 
 class ActionOnWorker(StatesGroup):

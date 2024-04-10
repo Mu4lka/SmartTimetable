@@ -10,7 +10,8 @@ from UI.methods import make_inline_keyboard, make_text_parameters, show_main_men
 from data import constants
 from database.enums import WorkerField
 from filters import IsAdmin, IsPrivate
-from utils import generate_key, sql
+from utils import sql
+from utils.methods import generate_key
 
 
 class CreatingWorker(StatesGroup):

@@ -1,6 +1,6 @@
 import asyncio
 
-from utils.google_sheets.base_spreadsheets import BaseSpreadsheets
+from utils.google_sheets import BaseSpreadsheets
 from utils.google_sheets.enums import Dimension
 
 

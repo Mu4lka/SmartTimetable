@@ -2,10 +2,10 @@ from typing import Any
 
 from database.database_config import database_name, table_workers
 from database.enums import QueryField, WorkerField
-from google_sheets.loader import spreadsheets
-from utils.google_sheets.enums import Dimension
+from google_sheets import spreadsheets
 from handlers.worker.send_timetable import calculate_number_of_hours
 from utils import sql
+from utils.google_sheets.enums import Dimension
 
 
 async def get_number_row(worker_id):

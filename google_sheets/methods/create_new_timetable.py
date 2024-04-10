@@ -1,5 +1,5 @@
 from data import constants
-from google_sheets.loader import spreadsheets
+from google_sheets import spreadsheets
 from utils.google_sheets.enums import Dimension
 
 

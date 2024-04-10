@@ -18,7 +18,8 @@ from database.enums.query_field import QueryType, QueryField
 from filters import IsAdmin, IsPrivate
 from google_sheets.methods import create_new_timetable, write_timetable
 from loader import bot
-from utils import sql, make_form
+from utils import sql
+from utils.methods import make_form
 
 
 class CoordinationTimetables(StatesGroup):

@@ -1,6 +1,6 @@
 from UI.buttons.enums import ButtonWorkerSetting
 from UI.buttons.enums.main_menu import BaseButton, AdminButton, WorkerButton
-from utils import get_list_from_enum
+from utils.methods import get_list_from_enum
 
 base_buttons = get_list_from_enum(BaseButton)
 admin_buttons = base_buttons + get_list_from_enum(AdminButton)
