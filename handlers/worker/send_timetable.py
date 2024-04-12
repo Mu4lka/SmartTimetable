@@ -14,7 +14,8 @@ from database.database_config import database_name, table_workers, table_queries
 from database.enums import WorkerField, QueryField
 from database.enums.query_field import QueryType
 from database.methods import found_from_database, get_worker_parameter_by_telegram_id
-from filters import IsWorker, IsPrivate
+from filters import IsWorker, IsPrivate, SpecificDays
+from filters.specific_days import Week
 from utils import sql
 from utils.methods import calculate_time_difference
 from utils.methods.calculate_time_difference import UnitTime
@@ -25,6 +26,84 @@ router = Router()
 class SendingTimetable(StatesGroup):
     timetable = State()
     apply = State()
+
+
+certain_days = {Week.FRIDAY, Week.SATURDAY, Week.SUNDAY}
+
+
+@router.callback_query(
+    SpecificDays(certain_days),
+    StateFilter(None),
+    IsWorker(),
+    F.data == WorkerButton.SEND_MY_TIMETABLE.value
+)
+async def start_sending_timetable(callback_query: types.CallbackQuery, state: FSMContext):
+    worker_id = await get_worker_parameter_by_telegram_id(
+        callback_query.from_user.id,
+        WorkerField.ID.value
+    )
+    if await found_from_database(
+            table_queries,
+            f"{QueryField.WORKER_ID.value} = ? AND {QueryField.TYPE.value} = ?",
+            (worker_id, QueryType.SENDING_TIMETABLE)):
+        await callback_query.message.edit_text(constants.INVALID_ABOUT_MORE_THAN_ONE_SCHEDULE)
+        await show_main_menu(callback_query.message, worker_buttons)
+        return
+    else:
+        await prepare_template(callback_query, state)
+
+
+@router.message(
+    SpecificDays(certain_days),
+    IsPrivate(),
+    StateFilter(SendingTimetable.timetable),
+    IsWorker()
+)
+async def process_timetable_input(message: types.Message, state: FSMContext):
+    try:
+        timetable = await make_timetable(message.text.split("\n"))
+        number_hours = await calculate_number_of_hours(timetable)
+        number_weekend = list(timetable.values()).count(constants.day_off)
+        await check_timetable(timetable, number_hours, number_weekend, await state.get_data())
+        await message.answer(
+            f"Количество часов: {number_hours}\nКоличество выходных: {number_weekend}\n\n",
+            reply_markup=await make_inline_keyboard(
+                [OtherButton.SEND_TIMETABLE.value, OtherButton.CHANGE.value]
+            )
+        )
+        await state.update_data(timetable=await sort_timetable(timetable))
+        await state.set_state(SendingTimetable.apply)
+    except Exception as error:
+        await message.answer(str(error))
+
+
+@router.callback_query(
+    SpecificDays(certain_days),
+    StateFilter(SendingTimetable.apply),
+    IsWorker()
+)
+async def handle_input(callback_query: types.CallbackQuery, state: FSMContext):
+    if callback_query.data == OtherButton.CHANGE.value:
+        await prepare_template(callback_query, state)
+    elif callback_query.data == OtherButton.SEND_TIMETABLE.value:
+        await insert_query_in_database(callback_query, state)
+
+
+@router.callback_query(
+    StateFilter(None),
+    IsWorker(),
+    F.data == WorkerButton.SEND_MY_TIMETABLE.value
+)
+async def warn_about_specific_days(callback_query: types.CallbackQuery):
+    certain_days = []
+    for day in certain_days:
+        certain_days.append(constants.week_russian[day.value])
+    certain_days.reverse()
+    certain_days_str = ", ".join(certain_days)
+    await callback_query.answer(
+        f"Отправить расписание вы можете только в определенные дни: {certain_days_str}",
+        show_alert=True
+    )
 
 
 async def get_data_for_sending_timetable(user_id: int):
@@ -45,9 +124,9 @@ async def get_data_for_sending_timetable(user_id: int):
 async def send_template(callback_query: types.CallbackQuery, number_hours: int, number_weekend: int):
     await callback_query.message.edit_text(
         f"{constants.EXAMPLE_TEMPLATE}"
-        "<b>Внимание, ваши условия</b>!\n"
-        f"Минимальное количество часов на неделю: {number_hours}\n"
-        f"Максимальное количество выходных: {number_weekend}",
+        "<b>Ваше расписание должно выполнять следующие требования:</b>\n"
+        f"- Минимальное количество часов на неделю: {number_hours}\n"
+        f"- Максимальное количество выходных: {number_weekend}",
         parse_mode="HTML"
     )
 
@@ -62,27 +141,6 @@ async def prepare_template(callback_query: types.CallbackQuery, state: FSMContex
     })
     await send_template(callback_query, number_hours, number_weekend)
     await state.set_state(SendingTimetable.timetable)
-
-
-@router.callback_query(
-    StateFilter(None),
-    IsWorker(),
-    F.data == WorkerButton.SEND_MY_TIMETABLE.value
-)
-async def start_sending_timetable(callback_query: types.CallbackQuery, state: FSMContext):
-    worker_id = await get_worker_parameter_by_telegram_id(
-        callback_query.from_user.id,
-        WorkerField.ID.value
-    )
-    if await found_from_database(
-            table_queries,
-            f"{QueryField.WORKER_ID.value} = ? AND {QueryField.TYPE.value} = ?",
-            (worker_id, QueryType.SENDING_TIMETABLE)):
-        await callback_query.message.edit_text(constants.INVALID_ABOUT_MORE_THAN_ONE_SCHEDULE)
-        await show_main_menu(callback_query.message, worker_buttons)
-        return
-    else:
-        await prepare_template(callback_query, state)
 
 
 async def make_timetable(lines: list):
@@ -159,29 +217,6 @@ async def sort_timetable(timetable: dict):
     return sorted_timetable
 
 
-@router.message(
-    IsPrivate(),
-    StateFilter(SendingTimetable.timetable),
-    IsWorker()
-)
-async def process_timetable_input(message: types.Message, state: FSMContext):
-    try:
-        timetable = await make_timetable(message.text.split("\n"))
-        number_hours = await calculate_number_of_hours(timetable)
-        number_weekend = list(timetable.values()).count(constants.day_off)
-        await check_timetable(timetable, number_hours, number_weekend, await state.get_data())
-        await message.answer(
-            f"Количество часов: {number_hours}\nКоличество выходных: {number_weekend}\n\n",
-            reply_markup=await make_inline_keyboard(
-                [OtherButton.SEND_TIMETABLE.value, OtherButton.CHANGE.value]
-            )
-        )
-        await state.update_data(timetable=await sort_timetable(timetable))
-        await state.set_state(SendingTimetable.apply)
-    except Exception as error:
-        await message.answer(str(error))
-
-
 async def make_query(worker_id: int, query_type: QueryType, query: dict):
     return {
         QueryField.WORKER_ID.value: worker_id,
@@ -206,14 +241,3 @@ async def insert_query_in_database(callback_query: types.CallbackQuery, state: F
     )
     await show_main_menu(callback_query.message, worker_buttons)
     await state.clear()
-
-
-@router.callback_query(
-    StateFilter(SendingTimetable.apply),
-    IsWorker()
-)
-async def handle_input(callback_query: types.CallbackQuery, state: FSMContext):
-    if callback_query.data == OtherButton.CHANGE.value:
-        await prepare_template(callback_query, state)
-    elif callback_query.data == OtherButton.SEND_TIMETABLE.value:
-        await insert_query_in_database(callback_query, state)

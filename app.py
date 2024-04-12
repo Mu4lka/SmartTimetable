@@ -5,8 +5,10 @@ from aiogram import Bot
 from database.methods import create_database
 from handlers import common, admin, worker, error
 from loader import bot, dispatcher
-from utils.methods import set_default_commands, on_startup_notify
-from utils.notify_workers import start_update_timetable
+from utils.methods import set_default_commands
+from utils.notification_system.notify_admins import start_update_query
+from utils.notification_system.notify_admins.on_startup_notify import on_startup_notify
+from utils.notification_system.notify_workers import start_update_timetable
 
 
 async def on_startup(bot: Bot):
@@ -15,6 +17,7 @@ async def on_startup(bot: Bot):
 
 
 async def main():
+    await start_update_query()
     await start_update_timetable()
     await create_database()
     await on_startup(bot)

@@ -13,7 +13,7 @@ class IsWorker(Filter):
             user_id = message.from_user.id
 
         if message.from_user.is_bot:
-            raise ValueError("Данные принадлежат сущности 'Бот'")
+            raise Exception("Данные принадлежат сущности 'Бот'")
 
         if await found_from_database(
                 table_workers,
