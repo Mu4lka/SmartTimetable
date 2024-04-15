@@ -5,7 +5,7 @@ from database.enums import QueryField, WorkerField
 from google_sheets import spreadsheets
 from handlers.worker.send_timetable import calculate_number_of_hours
 from utils import sql
-from utils.google_sheets.enums import Dimension
+from utils.google.enums import Dimension
 
 
 async def get_number_row(worker_id):
@@ -28,7 +28,7 @@ async def write_timetable(sheet_name: str, timetable: dict, user_data: Any):
             + list(timetable.values()) +
             [await calculate_number_of_hours(timetable)]
     )
-    await spreadsheets.batch_update_values(
+    await spreadsheets.async_batch_update_values(
         f"{sheet_name}!A{number_row}:I{number_row}",
         Dimension.ROWS,
         [values, ]

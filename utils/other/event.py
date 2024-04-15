@@ -8,6 +8,6 @@ class Event:
     def unsubscribe(self, func):
         self.__delegate.remove(func)
 
-    async def invoke(self, *args):
+    async def invoke(self, *args, **kwargs):
         for func in self.__delegate:
-            await func(*args)
+            await func(*args, **kwargs)

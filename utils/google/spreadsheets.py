@@ -5,7 +5,7 @@ import httplib2
 from apiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 
-from utils.google_sheets.enums import Dimension
+from utils.google.enums import Dimension
 
 
 class BaseSpreadsheets(ABC):
@@ -17,25 +17,39 @@ class BaseSpreadsheets(ABC):
         http_auth = credentials.authorize(httplib2.Http())
         service = discovery.build("sheets", "v4", http=http_auth)
 
-        self.__spreadsheet_id: str = spreadsheet_id
+        self.spreadsheet_id: str = spreadsheet_id
         self.spreadsheets = service.spreadsheets()
 
-    def _batch_update(self, requests: list):
+    @abstractmethod
+    def batch_update(self, requests: list):
+        pass
+
+    @abstractmethod
+    def get_values(self, sheet_range: str, dimension: Dimension):
+        pass
+
+    @abstractmethod
+    def batch_update_values(self, sheet_range: str, dimension: Dimension, values: list[list]):
+        pass
+
+
+class Spreadsheets(BaseSpreadsheets):
+    def batch_update(self, requests: list):
         self.spreadsheets.batchUpdate(
-            spreadsheetId=self.__spreadsheet_id,
+            spreadsheetId=self.spreadsheet_id,
             body={"requests": requests}
         ).execute()
 
-    def _get_values(self, sheet_range: str, dimension: Dimension):
+    def get_values(self, sheet_range: str, dimension: Dimension):
         return self.spreadsheets.values().get(
-            spreadsheetId=self.__spreadsheet_id,
+            spreadsheetId=self.spreadsheet_id,
             range=sheet_range,
             majorDimension=dimension.value
         ).execute()
 
-    def _batch_update_values(self, sheet_range: str, dimension: Dimension, values: list[list]):
+    def batch_update_values(self, sheet_range: str, dimension: Dimension, values: list[list]):
         self.spreadsheets.values().batchUpdate(
-            spreadsheetId=self.__spreadsheet_id,
+            spreadsheetId=self.spreadsheet_id,
             body={
                 "valueInputOption": "USER_ENTERED",
                 "data": {
@@ -45,15 +59,3 @@ class BaseSpreadsheets(ABC):
                 }
             }
         ).execute()
-
-    @abstractmethod
-    async def batch_update(self, requests: list):
-        pass
-
-    @abstractmethod
-    async def get_values(self, sheet_range: str, dimension: Dimension):
-        pass
-
-    @abstractmethod
-    async def batch_update_values(self, sheet_range: str, dimension: Dimension, values: list[list]):
-        pass

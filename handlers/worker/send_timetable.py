@@ -19,6 +19,7 @@ from filters.specific_days import Week
 from utils import sql
 from utils.methods import calculate_time_difference
 from utils.methods.calculate_time_difference import UnitTime
+from utils.methods.get_next_week_range import get_name_for_sheet_on_next_week
 
 router = Router()
 
@@ -95,13 +96,11 @@ async def handle_input(callback_query: types.CallbackQuery, state: FSMContext):
     F.data == WorkerButton.SEND_MY_TIMETABLE.value
 )
 async def warn_about_specific_days(callback_query: types.CallbackQuery):
-    certain_days = []
+    week_days = []
     for day in certain_days:
-        certain_days.append(constants.week_russian[day.value])
-    certain_days.reverse()
-    certain_days_str = ", ".join(certain_days)
+        week_days.append(constants.week_russian[day.value])
     await callback_query.answer(
-        f"Отправить расписание вы можете только в определенные дни: {certain_days_str}",
+        f"Отправить расписание вы можете только в определенные дни: {', '.join(week_days)}",
         show_alert=True
     )
 
@@ -116,13 +115,15 @@ async def get_data_for_sending_timetable(user_id: int):
             WorkerField.ID.value,
             WorkerField.NUMBER_HOURS.value,
             WorkerField.NUMBER_WEEKEND.value
-        ]
-    )
+        ])
     return result[0]
 
 
 async def send_template(callback_query: types.CallbackQuery, number_hours: int, number_weekend: int):
     await callback_query.message.edit_text(
+        f"<b>Отправьте расписание, которое пойдет на {get_name_for_sheet_on_next_week()}\n"
+        "Указание времени по Красноярску (GMT+7)\n\n"
+        "Пример шаблона:</b>\n\n"
         f"{constants.EXAMPLE_TEMPLATE}"
         "<b>Ваше расписание должно выполнять следующие требования:</b>\n"
         f"- Минимальное количество часов на неделю: {number_hours}\n"

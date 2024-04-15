@@ -16,24 +16,22 @@ router = Router()
 
 
 @router.callback_query(StateFilter(None), IsWorker(), F.data == WorkerButton.SHOW_MY_TIMETABLE.value)
-async def show_worker_timetable(callback_query: types.CallbackQuery, state: FSMContext):
+async def show_worker_timetable(callback_query: types.CallbackQuery):
     full_name = await get_worker_parameter_by_telegram_id(
         callback_query.from_user.id,
         WorkerField.FULL_NAME.value
     )
-    row = await find_row_by_name_from_timetable(timetable.sheet_timetable, full_name)
+    row = await find_row_by_name_from_timetable(timetable.get_data(), full_name)
     if row is None:
         await callback_query.message.edit_text(
             f"К сожалению Вас, {full_name}, в расписании не нашел, обратитесь к РОПу"
         )
-        await show_main_menu(callback_query.message, worker_buttons)
-        return
-    shifts = await get_shifts(row)
-    await callback_query.message.edit_text(
-        "Ваше расписание:\n\n"
-        f"<pre>{await make_form(dict(zip(constants.week_abbreviated, shifts)))}</pre>",
-        parse_mode="HTML"
-    )
+    else:
+        await callback_query.message.edit_text(
+            "Ваше расписание:\n\n"
+            f"<pre>{await make_form(dict(zip(constants.week_abbreviated, await get_shifts(row))))}</pre>",
+            parse_mode="HTML"
+        )
     await show_main_menu(callback_query.message, worker_buttons)
 
 
