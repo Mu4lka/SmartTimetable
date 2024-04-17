@@ -16,7 +16,7 @@ class Week(Enum):
 
 
 class SpecificDays(Filter):
-    def __init__(self, weekdays: set[Week]):
+    def __init__(self, weekdays: list[Week]):
         self.__weekdays = weekdays
 
     async def __call__(self, callback_query: types.CallbackQuery):

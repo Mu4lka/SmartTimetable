@@ -7,7 +7,7 @@ class TestTable(unittest.TestCase):
     name_database = "test_database"
     database = Database(name_database)
     name_table = "test_table"
-    table = Table(name_table, database, "")
+    table = Table(name_table, database, "column1 TEXT, column2 TEXT")
 
     def test_get_sql_to_select(self):
         sql = self.table.get_sql_to_select(
@@ -26,5 +26,9 @@ class TestTable(unittest.TestCase):
         self.assertEqual(sql, f"SELECT * FROM {self.name_table}")
 
     def test_get_sql_to_insert(self):
-        sql = self.table.get_sql_to_insert({"test_field1": 1, "test_field2": "test"})
-        self.assertEqual(sql, f"INSERT INTO {self.name_table} (test_field1,test_field2) VALUES (?,?)")
+        sql = self.table.get_sql_to_insert({"column1": 1, "column2": "test"})
+        self.assertEqual(sql, f"INSERT INTO {self.name_table} (column1,column2) VALUES (?,?)")
+
+    def test_get_sql_to_update(self):
+        sql = self.table.get_sql_to_update(["column1", "column2"], "condition")
+        self.assertEqual(sql, "UPDATE test_table SET column1 = ?, column2 = ? WHERE condition")

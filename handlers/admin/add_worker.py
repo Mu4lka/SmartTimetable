@@ -8,9 +8,9 @@ from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import AdminButton
 from UI.methods import make_inline_keyboard, make_text_parameters, show_main_menu
 from data import constants
-from database.enums import WorkerField
+from database import WorkerField
 from filters import IsAdmin, IsPrivate
-from utils import sql
+from loader import worker_table
 from utils.methods import generate_key
 
 
@@ -103,12 +103,10 @@ async def create_worker(callback_query: types.CallbackQuery, state: FSMContext):
 
 
 async def add_worker(message: types.Message, state: FSMContext):
-    from database.database_config import database_name, table_workers
-
     await state.update_data({WorkerField.KEY.value: await generate_key(constants.KEY_LENGTH)})
     user_data = await state.get_data()
 
-    await sql.insert(database_name, table_workers, user_data)
+    await worker_table.insert(user_data)
     await message.answer(
         constants.ABOUT_ADDING_WORKER +
         await make_text_parameters(constants.descriptions_worker_parameters, user_data) +

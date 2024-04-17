@@ -2,7 +2,6 @@ import asyncio
 
 from aiogram import Bot
 
-from database.methods import create_database
 from handlers import common, admin, worker, error
 from loader import bot, dispatcher
 from utils.methods import set_default_commands
@@ -21,7 +20,6 @@ async def main():
     await start_copy_sheet_for_next_week()
     await start_update_query()
     await start_update_timetable()
-    await create_database()
     await on_startup(bot)
     dispatcher.include_routers(error.router, common.router, admin.router, worker.router)
     await dispatcher.start_polling(bot)

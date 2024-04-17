@@ -9,8 +9,8 @@ from UI.buttons.enums.main_menu import BaseButton
 from UI.methods import show_main_menu, get_buttons, make_keyboard
 from data import constants
 from data.config import LINK_TO_TIMETABLE
-from database.methods import check_key
 from filters import IsAuthorized, IsPrivate, IsWorker, IsAdmin
+from loader import worker_table
 
 router = Router()
 
@@ -74,5 +74,5 @@ async def take_key(message: types.Message, state: FSMContext):
     if await IsAuthorized().__call__(message):
         return
 
-    if await check_key(message.text, message.from_user.id, message.from_user.username):
+    if await worker_table.check_key(message.text, message.from_user.id, message.from_user.username):
         await command_start(message, state)

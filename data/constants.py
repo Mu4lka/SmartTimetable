@@ -1,5 +1,5 @@
 from UI.buttons.enums.main_menu import BaseButton, WorkerButton, AdminButton
-from database.enums import WorkerField
+from database import WorkerField
 
 config_example = {
     "bot_token": "токен бота",
@@ -40,7 +40,7 @@ HELP_FOR_ADMIN = (
     f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
     f"<b>2. {AdminButton.ADD_WORKER.value}</b> - добавление сотрудника в базу данных\n"
     f"<b>3. {AdminButton.SHOW_WORKERS.value}</b> - "
-    f"показ списка сотрудников, также выбор сотрудника для его дальнейшей настройки."
+    f"показ списка сотрудников, также выбор сотрудника для его дальнейшей настройки.\n"
     f"<b>4. {AdminButton.COORDINATE_TIMETABLES.value}</b> - "
     f"отправленные сотрудниками расписания координируете для создания нового расписания на следующую неделю"
     f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к {CREATOR_NAME}"
@@ -61,11 +61,11 @@ ABOUT_SENDING_KEY_TO_WORKER = ("\nP.S. Вы можете отправить кл
                                "если вы не указали пользовательское имя сотрудника")
 
 INVALID_NUMBER_HOURS = (f"Число вне диапазона!\n"
-                        f"Число должно входить в диапазон от {MIN_NUMBER_HOURS} до {MAX_NUMBER_HOURS}.\n\n"
+                        f"Число должно входить в диапазон от {MIN_NUMBER_HOURS} до {MAX_NUMBER_HOURS}\n\n"
                         f"Попробуйте ещё раз...")
 
 INVALID_NUMBER_WEEKEND = (f"Число вне диапазона!\n"
-                          f"Число должно входить в диапазон от {MIN_NUMBER_WEEKEND} до {MAX_NUMBER_WEEKEND}.\n\n"
+                          f"Число должно входить в диапазон от {MIN_NUMBER_WEEKEND} до {MAX_NUMBER_WEEKEND}\n\n"
                           f"Попробуйте ещё раз...")
 
 INVALID_INPUT = "Неверный формат ввода, попробуйте ещё раз..."
@@ -89,7 +89,7 @@ NOT_AVAILABLE_YET = "пока не доступно"
 week_russian = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
 week_abbreviated = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
 
-format_timetable = ["Сотрудник"] + week_russian + ["Общие часы (ч)"]
+format_timetable = ["Сотрудник"] + week_russian
 
 descriptions_worker_parameters = {
     WorkerField.FULL_NAME.value: "Имя",

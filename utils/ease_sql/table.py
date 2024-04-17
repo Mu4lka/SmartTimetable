@@ -18,6 +18,10 @@ class BaseTable(ABC):
         pass
 
     @abstractmethod
+    async def update(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
     async def found(self, *args, **kwargs):
         pass
 
@@ -44,16 +48,30 @@ class Table(BaseTable):
             condition: str = None,
             parameters: tuple = None,
             columns: list[str] = None):
-
         cursor = self.__database.execute(
             self.get_sql_to_select(condition, columns),
             parameters
         )
         return cursor.fetchall()
 
+    async def update(
+            self,
+            columns: list[str],
+            condition: str,
+            parameters: tuple):
+        self.__database.execute(
+            self.get_sql_to_update(columns, condition),
+            parameters
+        )
+
     async def found(self, condition: str, parameters: tuple):
         result = await self.select(condition, parameters)
         return not len(result) == 0
+
+    def get_sql_to_update(self, columns: list[str], condition: str):
+        columns_str = "".join([columns[i] + " = ?, " for i in range(len(columns)-1)])
+        columns_str += columns[len(columns)-1] + " = ?"
+        return f"UPDATE {self.__name} SET {columns_str} WHERE {condition}"
 
     def get_sql_to_insert(self, fields: dict[str, Any]):
         columns = ",".join(fields.keys())
@@ -66,3 +84,4 @@ class Table(BaseTable):
         if condition is not None:
             sql += f" WHERE {condition}"
         return sql
+

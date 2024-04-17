@@ -10,16 +10,13 @@ from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import WorkerButton
 from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
-from database.database_config import database_name, table_workers, table_queries
-from database.enums import WorkerField, QueryField
-from database.enums.query_field import QueryType
-from database.methods import found_from_database, get_worker_parameter_by_telegram_id
+from database import WorkerField, QueryField, QueryType
 from filters import IsWorker, IsPrivate, SpecificDays
 from filters.specific_days import Week
-from utils import sql
+from loader import query_table, worker_table
 from utils.methods import calculate_time_difference
 from utils.methods.calculate_time_difference import UnitTime
-from utils.methods.get_next_week_range import get_name_for_sheet_on_next_week
+from utils.methods.get_next_week_range import get_sheet_name
 
 router = Router()
 
@@ -29,7 +26,12 @@ class SendingTimetable(StatesGroup):
     apply = State()
 
 
-certain_days = {Week.FRIDAY, Week.SATURDAY, Week.SUNDAY}
+certain_days = [
+    Week.WEDNESDAY,
+    Week.FRIDAY,
+    Week.SATURDAY,
+    Week.SUNDAY
+]
 
 
 @router.callback_query(
@@ -39,12 +41,11 @@ certain_days = {Week.FRIDAY, Week.SATURDAY, Week.SUNDAY}
     F.data == WorkerButton.SEND_MY_TIMETABLE.value
 )
 async def start_sending_timetable(callback_query: types.CallbackQuery, state: FSMContext):
-    worker_id = await get_worker_parameter_by_telegram_id(
+    worker_id = await worker_table.get_values_by_telegram_id(
         callback_query.from_user.id,
-        WorkerField.ID.value
+        [WorkerField.ID.value, ]
     )
-    if await found_from_database(
-            table_queries,
+    if await query_table.found(
             f"{QueryField.WORKER_ID.value} = ? AND {QueryField.TYPE.value} = ?",
             (worker_id, QueryType.SENDING_TIMETABLE)):
         await callback_query.message.edit_text(constants.INVALID_ABOUT_MORE_THAN_ONE_SCHEDULE)
@@ -106,9 +107,7 @@ async def warn_about_specific_days(callback_query: types.CallbackQuery):
 
 
 async def get_data_for_sending_timetable(user_id: int):
-    result = await sql.select(
-        database_name,
-        table_workers,
+    result = await worker_table.select(
         f"{WorkerField.TELEGRAM_ID.value} = ?",
         (user_id,),
         [
@@ -121,7 +120,7 @@ async def get_data_for_sending_timetable(user_id: int):
 
 async def send_template(callback_query: types.CallbackQuery, number_hours: int, number_weekend: int):
     await callback_query.message.edit_text(
-        f"<b>Отправьте расписание, которое пойдет на {get_name_for_sheet_on_next_week()}\n"
+        f"<b>Отправьте расписание, которое пойдет на {get_sheet_name()}\n"
         "Указание времени по Красноярску (GMT+7)\n\n"
         "Пример шаблона:</b>\n\n"
         f"{constants.EXAMPLE_TEMPLATE}"
@@ -218,25 +217,13 @@ async def sort_timetable(timetable: dict):
     return sorted_timetable
 
 
-async def make_query(worker_id: int, query_type: QueryType, query: dict):
-    return {
-        QueryField.WORKER_ID.value: worker_id,
-        QueryField.TYPE.value: query_type.value,
-        QueryField.QUERY_TEXT.value: json.dumps(query),
-    }
-
-
 async def insert_query_in_database(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    await sql.insert(
-        database_name,
-        table_queries,
-        await make_query(
-            user_data[WorkerField.ID.value],
-            QueryType.SENDING_TIMETABLE,
-            user_data["timetable"]
-        )
-    )
+    await query_table.insert({
+        QueryField.WORKER_ID.value: user_data[WorkerField.ID.value],
+        QueryField.TYPE.value: QueryType.SENDING_TIMETABLE,
+        QueryField.QUERY_TEXT.value: json.dumps(user_data["timetable"])
+    })
     await callback_query.message.edit_text(
         "Вы отправили расписание!\nОжидайте подтверждение руководителя..."
     )
