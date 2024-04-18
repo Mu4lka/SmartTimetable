@@ -133,16 +133,23 @@ async def set_timetable_in_spread_sheet(user_data, _timetable: dict):
     number_row = await worker_table.worker_number(worker_id) + 2
     values = ([user_data[WorkerField.FULL_NAME.value]]
               + list(_timetable.values()))
-    name = get_sheet_name()
+    new_name = get_sheet_name()
     try:
-        await timetable.write(name, values, number_row)
+        await timetable.write(new_name, values, number_row)
     except Exception as error:
-        print(f"[WARNING][Timetable.set_timetable_in_spread_sheet] - {error}")
+        print(f"[WARNING][set_timetable_in_spread_sheet]"
+              f"Failed to write to Google sheet [TRY AGAIN]!\nDetails: {error}")
         await asyncio.sleep(0.2)
         try:
-            await timetable.copy_sheet(name)
+            try:
+                current_name = get_sheet_name(0)
+                await timetable.copy_sheet(new_name, current_name)
+            except Exception as error:
+                print(f"[WARNING][set_timetable_in_spread_sheet]\n"
+                      f"Failed to copy sheet by name. The first sheet will be copied!\nDetails: {error}")
+                await timetable.copy_sheet(new_name)
         except Exception as error:
-            pass
+            print(f"[WARNING][set_timetable_in_spread_sheet]\nFailed to copy sheet when writing!\nDetails: {error}")
         await set_timetable_in_spread_sheet(user_data, _timetable)
 
 

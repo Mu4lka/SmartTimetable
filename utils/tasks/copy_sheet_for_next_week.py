@@ -14,7 +14,12 @@ async def copy_sheet_for_next_week():
             new_name = get_sheet_name()
             try:
                 await asyncio.sleep(UnitTime.SECONDS.value)
-                await timetable.copy_sheet(new_name)
+                try:
+                    current_name = get_sheet_name(0)
+                    await timetable.copy_sheet(new_name, current_name)
+                except Exception as error:
+                    print(f"[WARNING] Failed to copy sheet by name. The first sheet will be copied!\nDetails: {error}")
+                    await timetable.copy_sheet(new_name)
             except Exception as error:
-                print(f"[WARNING][tasks.copy_sheet_for_next_week] - {error}")
+                print(f"[WARNING] Failed to copy sheet!\nDetails: {error}")
         await asyncio.sleep(UnitTime.HOURS.value)

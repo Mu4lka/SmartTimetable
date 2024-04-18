@@ -39,7 +39,7 @@ class Timetable(AsyncSpreadsheets):
                 current_data = await self.get_current_data()
             except Exception as error:
                 await asyncio.sleep(UnitTime.SECONDS.value)
-                print(f"[WARNING][Timetable.__update(self.get_current_data())] - {error}")
+                print(f"[WARNING] Failed to get data from Google sheet [TRY_AGAIN]!\nDetails: {error}")
                 continue
             await self.on_update.invoke(self.__data.copy())
             for item in range(len(self.__data)):
@@ -47,7 +47,7 @@ class Timetable(AsyncSpreadsheets):
                     if self.__data[item] != current_data[item]:
                         await self.on_change.invoke(current_data[item].copy())
                 except Exception as error:
-                    print(f"[WARNING][Timetable.__update] - {error}")
+                    print(f"[WARNING] Failed to compare timetable\nDetails: {error}")
             self.__data = current_data
             await asyncio.sleep(UnitTime.MINUTES.value)
 
