@@ -28,10 +28,7 @@ router = Router()
 @router.callback_query(StateFilter(None), IsAdmin(), F.data == AdminButton.COORDINATE_TIMETABLES.value)
 async def coordinate_timetables(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.delete()
-    queries = await query_table.select(
-            f"{QueryField.TYPE.value} = ?",
-            (QueryType.SENDING_TIMETABLE.value,)
-        )
+    queries = await query_table.get_queries(QueryType.SENDING_TIMETABLE)
 
     if await has_pending_queries(queries, callback_query.message, state):
         await state.update_data(queries=queries)
@@ -48,7 +45,7 @@ async def show_next_timetable(message: types.Message, state: FSMContext):
         worker_data = await worker_table.select(
             f"{WorkerField.ID.value} = ?",
             (query_data[QueryField.WORKER_ID.value],),
-            [WorkerField.FULL_NAME.value, WorkerField.TELEGRAM_ID]
+            [WorkerField.FULL_NAME.value, WorkerField.TELEGRAM_ID.value]
         )
         full_name, user_id = worker_data[0]
         await state.update_data({
@@ -73,8 +70,9 @@ async def show_next_timetable(message: types.Message, state: FSMContext):
 )
 async def accept_timetable(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    timetable: dict = json.loads(user_data["query_data"][QueryField.QUERY_TEXT.value])
-    await set_timetable_in_spread_sheet(user_data, timetable)
+    query = json.loads(user_data["query_data"][QueryField.QUERY_TEXT.value])
+    _timetable = query["timetable"]
+    await set_timetable_in_spread_sheet(user_data, _timetable)
     await callback_query.message.edit_text("Вы приняли расписание...")
     await bot.send_message(user_data[WorkerField.TELEGRAM_ID.value], f"Ваше расписание принято!")
     await delete_query(callback_query.message, state)
@@ -125,9 +123,9 @@ async def extract_query_data(queries):
     }
 
 
-async def make_form_for_coordination_timetable(timetable: dict, full_name: str):
-    form = await make_form(timetable)
-    return f"Расписание сотрудника {full_name}:\n\n<pre>{form}</pre>"
+async def make_form_for_coordination_timetable(_timetable: dict, full_name: str):
+    form = await make_form(_timetable["timetable"])
+    return f"Расписание сотрудника {full_name}:\n\n<pre>{form}</pre>\nКоличество часов: {_timetable['hours_number']}"
 
 
 async def set_timetable_in_spread_sheet(user_data, _timetable: dict):
@@ -139,6 +137,7 @@ async def set_timetable_in_spread_sheet(user_data, _timetable: dict):
     try:
         await timetable.write(name, values, number_row)
     except Exception as error:
+        print(f"[WARNING][Timetable.set_timetable_in_spread_sheet] - {error}")
         await asyncio.sleep(0.2)
         try:
             await timetable.copy_sheet(name)

@@ -13,6 +13,7 @@ async def copy_sheet_for_next_week():
         if Week(datetime.now().weekday()) in certain_days:
             new_name = get_sheet_name()
             try:
+                await asyncio.sleep(UnitTime.SECONDS.value)
                 await timetable.copy_sheet(new_name)
             except Exception as error:
                 print(f"[WARNING][tasks.copy_sheet_for_next_week] - {error}")

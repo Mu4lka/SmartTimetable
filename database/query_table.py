@@ -28,3 +28,8 @@ class QueryTable(Table):
     def __init__(self, database: Database):
         super().__init__(self.name, database, self.fields)
 
+    async def get_queries(self, query_type: QueryType):
+        return await self.select(
+            f"{QueryField.TYPE.value} = ?",
+            (query_type.value,)
+        )

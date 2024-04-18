@@ -29,16 +29,18 @@ class Timetable(AsyncSpreadsheets):
         sheet_range = "A1:Z1000"
         if isinstance(sheet_name, str):
             sheet_range = sheet_name + "!" + sheet_range
-
         result = await self.async_get_values(
-            sheet_range,
-            Dimension.ROWS
-        )
+            sheet_range, Dimension.ROWS)
         return result["values"]
 
     async def __update(self):
         while self.__running:
-            current_data = await self.get_current_data()
+            try:
+                current_data = await self.get_current_data()
+            except Exception as error:
+                await asyncio.sleep(UnitTime.SECONDS.value)
+                print(f"[WARNING][Timetable.__update(self.get_current_data())] - {error}")
+                continue
             await self.on_update.invoke(self.__data.copy())
             for item in range(len(self.__data)):
                 try:

@@ -27,7 +27,7 @@ class SendingTimetable(StatesGroup):
 
 
 certain_days = [
-    Week.WEDNESDAY,
+    Week.THURSDAY,
     Week.FRIDAY,
     Week.SATURDAY,
     Week.SUNDAY
@@ -73,7 +73,11 @@ async def process_timetable_input(message: types.Message, state: FSMContext):
                 [OtherButton.SEND_TIMETABLE.value, OtherButton.CHANGE.value]
             )
         )
-        await state.update_data(timetable=await sort_timetable(timetable))
+        await state.update_data(
+            {
+                "timetable": await sort_timetable(timetable),
+                "hours_number": number_hours
+            })
         await state.set_state(SendingTimetable.apply)
     except Exception as error:
         await message.answer(str(error))
@@ -181,14 +185,14 @@ async def calculate_number_of_hours(timetable: dict):
 
 async def check_filled_days(timetable: dict):
     if len(timetable) != len(constants.week_abbreviated):
-        raise ValueError("Не все заполнены дни, попробуйте ещё раз...")
+        raise ValueError("Не все заполнены дни. Введите снова...")
 
 
 async def check_hours_number(number_hours: float, min_number_hours: float):
     if number_hours < min_number_hours:
         raise ValueError(
             f"Количество часов за неделю меньше, чем задано!\n"
-            f"Должно быть не менее {min_number_hours}. Всего: {number_hours}. Попробуйте ещё раз..."
+            f"Должно быть не менее {min_number_hours}. Вы указали: {number_hours}. Введите снова..."
         )
 
 
@@ -196,7 +200,7 @@ async def check_weekend_number(number_weekend: int, max_number_weekend: int):
     if number_weekend > max_number_weekend:
         raise ValueError(
             f"Количество выходных в неделю больше, чем задано!\n"
-            f"Должно быть не более {max_number_weekend}. Всего: {number_weekend}. Попробуйте ещё раз..."
+            f"Должно быть не более {max_number_weekend}. Вы указали: {number_weekend}. Введите снова..."
         )
 
 
@@ -219,10 +223,11 @@ async def sort_timetable(timetable: dict):
 
 async def insert_query_in_database(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+    query: dict = {"timetable": user_data["timetable"], "hours_number": user_data["hours_number"]}
     await query_table.insert({
         QueryField.WORKER_ID.value: user_data[WorkerField.ID.value],
         QueryField.TYPE.value: QueryType.SENDING_TIMETABLE,
-        QueryField.QUERY_TEXT.value: json.dumps(user_data["timetable"])
+        QueryField.QUERY_TEXT.value: json.dumps(query)
     })
     await callback_query.message.edit_text(
         "Вы отправили расписание!\nОжидайте подтверждение руководителя..."
