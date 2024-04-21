@@ -1,4 +1,3 @@
-import asyncio
 import json
 
 from aiogram import Router, F, types
@@ -12,9 +11,9 @@ from UI.buttons.enums.main_menu import AdminButton
 from UI.methods import show_main_menu, make_inline_keyboard
 from database import WorkerField, QueryField, QueryType
 from filters import IsAdmin, IsPrivate
-from loader import bot, query_table, worker_table, timetable
+from loader import bot, query_table, worker_table, google_timetable
+from timetable import GoogleTimetable
 from utils.methods import make_form
-from utils.methods.get_next_week_range import get_sheet_name
 
 
 class CoordinationTimetables(StatesGroup):
@@ -72,7 +71,7 @@ async def accept_timetable(callback_query: types.CallbackQuery, state: FSMContex
     user_data = await state.get_data()
     query = json.loads(user_data["query_data"][QueryField.QUERY_TEXT.value])
     _timetable = query["timetable"]
-    await set_timetable_in_spread_sheet(user_data, _timetable)
+    await write_item_in_timetable(user_data, _timetable)
     await callback_query.message.edit_text("Вы приняли расписание...")
     await bot.send_message(user_data[WorkerField.TELEGRAM_ID.value], f"Ваше расписание принято!")
     await delete_query(callback_query.message, state)
@@ -128,29 +127,13 @@ async def make_form_for_coordination_timetable(_timetable: dict, full_name: str)
     return f"Расписание сотрудника {full_name}:\n\n<pre>{form}</pre>\nКоличество часов: {_timetable['hours_number']}"
 
 
-async def set_timetable_in_spread_sheet(user_data, _timetable: dict):
+async def write_item_in_timetable(user_data, timetable_element: dict):
     worker_id = user_data["query_data"][QueryField.WORKER_ID.value]
-    number_row = await worker_table.worker_number(worker_id) + 2
-    values = ([user_data[WorkerField.FULL_NAME.value]]
-              + list(_timetable.values()))
-    new_name = get_sheet_name()
-    try:
-        await timetable.write(new_name, values, number_row)
-    except Exception as error:
-        print(f"[WARNING][set_timetable_in_spread_sheet]"
-              f"Failed to write to Google sheet [TRY AGAIN]!\nDetails: {error}")
-        await asyncio.sleep(0.2)
-        try:
-            try:
-                current_name = get_sheet_name(0)
-                await timetable.copy_sheet(new_name, current_name)
-            except Exception as error:
-                print(f"[WARNING][set_timetable_in_spread_sheet]\n"
-                      f"Failed to copy sheet by name. The first sheet will be copied!\nDetails: {error}")
-                await timetable.copy_sheet(new_name)
-        except Exception as error:
-            print(f"[WARNING][set_timetable_in_spread_sheet]\nFailed to copy sheet when writing!\nDetails: {error}")
-        await set_timetable_in_spread_sheet(user_data, _timetable)
+    position = await worker_table.worker_number(worker_id) + 2
+    element = ([user_data[WorkerField.FULL_NAME.value]]
+               + list(timetable_element.values()))
+    next_week_name = GoogleTimetable.get_week_range_name()
+    await google_timetable.write_element(element, position, next_week_name)
 
 
 async def delete_query(message: types.Message, state: FSMContext):

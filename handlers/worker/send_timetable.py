@@ -14,9 +14,9 @@ from database import WorkerField, QueryField, QueryType
 from filters import IsWorker, IsPrivate, SpecificDays
 from filters.specific_days import Week
 from loader import query_table, worker_table
+from timetable import GoogleTimetable
 from utils.methods import calculate_time_difference
 from utils.methods.calculate_time_difference import UnitTime
-from utils.methods.get_next_week_range import get_sheet_name
 
 router = Router()
 
@@ -27,7 +27,7 @@ class SendingTimetable(StatesGroup):
 
 
 certain_days = [
-    Week.THURSDAY,
+    Week.MONDAY,
     Week.FRIDAY,
     Week.SATURDAY,
     Week.SUNDAY
@@ -124,7 +124,7 @@ async def get_data_for_sending_timetable(user_id: int):
 
 async def send_template(callback_query: types.CallbackQuery, number_hours: int, number_weekend: int):
     await callback_query.message.edit_text(
-        f"<b>Отправьте расписание, которое пойдет на {get_sheet_name()}\n"
+        f"<b>Отправьте расписание, которое пойдет на {GoogleTimetable.get_week_range_name()}\n"
         "Указание времени по Красноярску (GMT+7)\n\n"
         "Пример шаблона:</b>\n\n"
         f"{constants.EXAMPLE_TEMPLATE}"

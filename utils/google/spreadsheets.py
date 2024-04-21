@@ -59,3 +59,15 @@ class Spreadsheets(BaseSpreadsheets):
                 }
             }
         ).execute()
+
+    def duplicate_sheet(self, sheet_id: int, new_name: str):
+        return self.batch_update([{
+            "duplicateSheet": {
+                "sourceSheetId": sheet_id,
+                "newSheetName": new_name
+            }}])
+
+    def get(self):
+        return self.spreadsheets.get(
+            spreadsheetId=self.spreadsheet_id,
+        ).execute()
