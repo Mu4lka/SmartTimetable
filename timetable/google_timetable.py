@@ -11,7 +11,8 @@ from utils.methods import get_week_range, is_time_in_range
 def html_color_to_json(html_color):
     if html_color.startswith("#"):
         html_color = html_color[1:]
-    return {"red": int(html_color[0:2], 16) / 255.0, "green": int(html_color[2:4], 16) / 255.0,
+    return {"red": int(html_color[0:2], 16) / 255.0,
+            "green": int(html_color[2:4], 16) / 255.0,
             "blue": int(html_color[4:6], 16) / 255.0}
 
 
@@ -23,20 +24,21 @@ class Background(dict, Enum):
 
 
 class GoogleTimetable:
-    def __init__(self, spreadsheet: AsyncSpreadsheets):
-        self.__spreadsheet = spreadsheet
+    def __init__(self, spreadsheets: AsyncSpreadsheets):
+        self.__spreadsheets = spreadsheets
         self.sheets = {}
 
     async def write_element(self, element: list, position: int, sheet_name: str):
         try:
-            await self.__spreadsheet.async_batch_update_values(
+            await self.__spreadsheets.async_batch_update_values(
                 f"{sheet_name}!A{position}:Z{position}",
                 Dimension.ROWS,
                 [element, ]
             )
             await self.__paint_background(element, position, sheet_name)
         except Exception as error:
-            print(f"[WARNING] Failed write for next week. Making a copy![TO_RETRY]\nDetails: {error}")
+            print(f"[WARNING] Failed write for next week."
+                  f"Try to create a copy of the sheet![TO_RETRY]\nDetails: {error}")
             await self.copy_timetable(sheet_name)
             await self.write_element(element, position, sheet_name)
 
@@ -47,7 +49,7 @@ class GoogleTimetable:
 
     async def set_sheets(self):
         try:
-            spreadsheets = await self.__spreadsheet.async_get_spreadsheets()
+            spreadsheets = await self.__spreadsheets.async_get_spreadsheets()
             sheets = {}
             for sheet in spreadsheets['sheets']:
                 sheet = Sheet(sheet['properties'])
@@ -55,7 +57,8 @@ class GoogleTimetable:
                 sheets.update({title: sheet})
             self.sheets = sheets
         except Exception as error:
-            print(f"[WARNING] Failed to get sheets from Google sheet [TO_RETRY]!\nDetails: {error}")
+            print(f"[WARNING] Failed to get sheets from Google sheet [TO_RETRY]!"
+                  f"\nDetails: {error}")
             await asyncio.sleep(0.2)
             await self.set_sheets()
 
@@ -69,7 +72,7 @@ class GoogleTimetable:
             first_sheet_id = list(self.sheets.values())[0].sheetId
             sheet_id = first_sheet_id
         try:
-            await self.__spreadsheet.async_duplicate_sheet(sheet_id, new_sheet_name)
+            await self.__spreadsheets.async_duplicate_sheet(sheet_id, new_sheet_name)
         except Exception as error:
             print(f"[WARNING] Failed to copy first sheet!\nDetails: {error}")
 
@@ -102,4 +105,4 @@ class GoogleTimetable:
                      self.sheets[sheet_name].sheetId,
                      f"A{position}:I{position}"),
                  'rows': [{'values': values}]}}
-        await self.__spreadsheet.async_batch_update([request, ])
+        await self.__spreadsheets.async_batch_update([request, ])

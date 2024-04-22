@@ -7,11 +7,11 @@ from utils.other import Event
 
 
 class TimetableStorage:
-    def __init__(self, spreadsheet: AsyncSpreadsheets):
+    def __init__(self, spreadsheets: AsyncSpreadsheets):
         self.on_update = Event()
         self.on_change = Event()
 
-        self.__spreadsheet = spreadsheet
+        self.__spreadsheets = spreadsheets
         self.__data = []
         self.__running = False
 
@@ -26,10 +26,10 @@ class TimetableStorage:
         self.__running = False
 
     async def get_current_data(self, sheet_name: str = None):
-        sheet_range = "A1:Z1000"
+        sheet_range = "A1:H1000"
         if isinstance(sheet_name, str):
             sheet_range = sheet_name + "!" + sheet_range
-        result = await self.__spreadsheet.async_get_values(
+        result = await self.__spreadsheets.async_get_values(
             sheet_range, Dimension.ROWS)
         return result["values"]
 
@@ -45,7 +45,10 @@ class TimetableStorage:
             for item in range(len(self.__data)):
                 try:
                     if self.__data[item] != current_data[item]:
-                        await self.on_change.invoke(current_data[item].copy())
+                        await self.on_change.invoke(
+                            current_data[item].copy(),
+                            self.__data[item].copy()
+                        )
                 except Exception as error:
                     print(f"[WARNING] Failed to compare timetable\nDetails: {error}")
             self.__data = current_data

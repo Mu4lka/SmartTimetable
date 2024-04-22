@@ -1,8 +1,8 @@
 from data import constants
-from utils.methods import get_config
+from utils.methods import get_json_from_file
 
 config_file_name = "config.json"
-config = get_config(config_file_name, constants.config_example)
+config = get_json_from_file(config_file_name, constants.config_example)
 
 BOT_TOKEN = config["bot_token"]
 ADMIN_IDS = config["admin_ids"]
