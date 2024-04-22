@@ -130,7 +130,7 @@ async def show_parameters(callback_query: types.CallbackQuery, state: FSMContext
         list(constants.descriptions_worker_parameters.keys())
     )
 
-    form_parameters = await make_form(
+    form_parameters = make_form(
         dict(zip(constants.descriptions_worker_parameters.values(), worker[0])))
 
     await callback_query.message.edit_text(

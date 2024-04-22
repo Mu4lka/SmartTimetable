@@ -11,7 +11,7 @@ bot = Bot(config.BOT_TOKEN)
 dispatcher = Dispatcher()
 
 spreadsheets = AsyncSpreadsheets(CREDENTIALS_FILE, SPREADSHEET_ID)
-storage_timetable = TimetableStorage(spreadsheets)
+timetable_storage = TimetableStorage(spreadsheets)
 google_timetable = GoogleTimetable(spreadsheets)
 
 database = Database("smart_timetable")

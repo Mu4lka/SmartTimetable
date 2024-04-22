@@ -123,7 +123,7 @@ async def extract_query_data(queries):
 
 
 async def make_form_for_coordination_timetable(_timetable: dict, full_name: str):
-    form = await make_form(_timetable["timetable"])
+    form = make_form(_timetable["timetable"])
     return f"Расписание сотрудника {full_name}:\n\n<pre>{form}</pre>\nКоличество часов: {_timetable['hours_number']}"
 
 

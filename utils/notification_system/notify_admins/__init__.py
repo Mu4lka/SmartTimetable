@@ -1,7 +1,7 @@
 import asyncio
 
-from .notify_about_new_sent_timetable import notify_about_new_sent_timetable
+from .new_sent_timetables import new_sent_timetables
 
 
 async def start_update_query():
-    task = asyncio.create_task(notify_about_new_sent_timetable())
+    task = asyncio.create_task(new_sent_timetables())

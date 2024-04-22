@@ -8,7 +8,7 @@ from utils.methods.calculate_time_difference import UnitTime
 from utils.methods import is_time_in_range
 
 
-async def notify_about_new_sent_timetable():
+async def new_sent_timetables():
     while True:
         if len(await query_table.get_queries(QueryType.SENDING_TIMETABLE)) != 0:
             if is_time_in_range("12:00", "20:00"):

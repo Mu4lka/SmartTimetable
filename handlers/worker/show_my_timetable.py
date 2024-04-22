@@ -7,7 +7,7 @@ from UI.methods import show_main_menu
 from data import constants
 from database import WorkerField
 from filters import IsWorker
-from loader import storage_timetable, worker_table
+from loader import timetable_storage, worker_table
 from utils.methods import make_form
 
 router = Router()
@@ -19,12 +19,12 @@ async def show_worker_timetable(callback_query: types.CallbackQuery):
         callback_query.from_user.id,
         [WorkerField.FULL_NAME.value,]
     )
-    row = await find_row_by_name_from_timetable(storage_timetable.get_data(), full_name)
+    row = await find_row_by_name_from_timetable(timetable_storage.get_timetable(), full_name)
     if row is None:
         text = f"К сожалению Вас, {full_name}, в расписании не нашел, обратитесь к РОПу"
     else:
-        text = ("Ваше расписание:\n\n"
-                f"<pre>{await make_form(dict(zip(constants.week_abbreviated, await get_shifts(row))))}</pre>")
+        text = (f"<b>Ваше расписание:</b>\n\n"
+                f"<pre>{make_form(dict(zip(constants.week_abbreviated, await get_shifts(row))))}</pre>")
     await callback_query.message.edit_text(text, parse_mode="HTML")
     await show_main_menu(callback_query.message, worker_buttons)
 

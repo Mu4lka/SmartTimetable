@@ -1,5 +1,6 @@
 import asyncio
 
+import loader
 from utils.google import AsyncSpreadsheets
 from utils.google.enums import Dimension
 from utils.methods.calculate_time_difference import UnitTime
@@ -12,20 +13,15 @@ class TimetableStorage:
         self.on_change = Event()
 
         self.__spreadsheets = spreadsheets
-        self.__data = []
-        self.__running = False
+        self.__timetable = []
 
-    def get_data(self):
-        return self.__data.copy()
+    def get_timetable(self):
+        return self.__timetable.copy()
 
     async def start_update(self):
-        self.__running = True
         await self.__update()
 
-    def stop_update(self):
-        self.__running = False
-
-    async def get_current_data(self, sheet_name: str = None):
+    async def get_current_timetable(self, sheet_name: str = None):
         sheet_range = "A1:H1000"
         if isinstance(sheet_name, str):
             sheet_range = sheet_name + "!" + sheet_range
@@ -34,22 +30,28 @@ class TimetableStorage:
         return result["values"]
 
     async def __update(self):
-        while self.__running:
+        while True:
+            sheet_name = loader.google_timetable.get_week_range_name(0)
             try:
-                current_data = await self.get_current_data()
+                current_timetable = await self.get_current_timetable(sheet_name)
             except Exception as error:
                 await asyncio.sleep(UnitTime.SECONDS.value)
-                print(f"[WARNING] Failed to get data from Google sheet [TO_RETRY]!\nDetails: {error}")
+                print(f"[WARNING] Failed to get data from Google sheet. "
+                      f"Try to create a copy of the sheet![TO_RETRY]\nDetails: {error}")
+                await loader.google_timetable.copy_timetable(sheet_name)
                 continue
-            await self.on_update.invoke(self.__data.copy())
-            for item in range(len(self.__data)):
+            await self.on_update.invoke(self.__timetable.copy())
+            for item in range(len(self.__timetable)):
                 try:
-                    if self.__data[item] != current_data[item]:
+                    if self.__timetable[item] != current_timetable[item]:
                         await self.on_change.invoke(
-                            current_data[item].copy(),
-                            self.__data[item].copy()
+                            current_timetable[item].copy(),
+                            self.__timetable[item].copy(),
+                            sheet_name
                         )
                 except Exception as error:
-                    print(f"[WARNING] Failed to compare timetable\nDetails: {error}")
-            self.__data = current_data
+                    print(f"[WARNING] The operation failed"
+                          f" when comparing timetable elements.\n"
+                          f"Details: {error}")
+            self.__timetable = current_timetable
             await asyncio.sleep(UnitTime.MINUTES.value)
