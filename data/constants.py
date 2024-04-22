@@ -1,5 +1,13 @@
 from UI.buttons.enums.main_menu import BaseButton, WorkerButton, AdminButton
 from database import WorkerField
+from utils.other import Week
+
+certain_days = [
+    Week.TUESDAY,
+    Week.FRIDAY,
+    Week.SATURDAY,
+    Week.SUNDAY
+]
 
 config_example = {
     "bot_token": "токен бота",
@@ -11,8 +19,6 @@ config_example = {
 CREATOR_ID = 5680705403
 CREATOR_NAME = "@Mu4lka"
 
-DAY_START = 0
-DAY_END = 24
 MAX_SHIFT_DURATION = 20
 KEY_LENGTH = 12
 
@@ -31,7 +37,7 @@ HELP_FOR_WORKER = (
     "Ваши команды:\n"
     f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
     f"<b>2. {WorkerButton.SHOW_MY_TIMETABLE.value}</b> - отправит ваше расписание из google-таблицы\n"
-    f"<b>3. {WorkerButton.SEND_MY_TIMETABLE.value}</b> - "
+    f"<b>3. {WorkerButton.SEND_TIMETABLE.value}</b> - "
     f"Отправить расписание на следующую неделю вы можете в определенные дни. Руководитель проверит ваше расписание."
     f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к вашему руководителю")
 
@@ -110,5 +116,5 @@ EXAMPLE_TEMPLATE = (
     f"вс: {day_off}</pre>\n\n"
 )
 
-NOTIFY_ABOUT_NEW_SENT_TIMETABLE = (f"Есть расписания, которые отправили сотрудники! Нажмите в главном меню кнопку "
-                                   f"\"{AdminButton.COORDINATE_TIMETABLES.value}\", чтобы их принять или отклонить")
+NOTIFY_UNCONFIRMED_TIMETABLES = (
+    f"Есть расписания, которые отправили сотрудники!")

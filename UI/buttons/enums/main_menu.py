@@ -13,4 +13,4 @@ class AdminButton(str, Enum):
 
 class WorkerButton(str, Enum):
     SHOW_MY_TIMETABLE = "Показать мое расписание"
-    SEND_MY_TIMETABLE = "Отправить мое расписание"
+    SEND_TIMETABLE = "Отправить расписание"

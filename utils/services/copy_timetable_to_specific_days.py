@@ -1,8 +1,8 @@
 import asyncio
 from datetime import datetime
 
-from filters.specific_days import Week
-from handlers.worker.send_timetable import certain_days
+from data.constants import certain_days
+from utils.other import Week
 from loader import google_timetable
 from timetable import GoogleTimetable
 from utils.methods.calculate_time_difference import UnitTime

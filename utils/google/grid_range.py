@@ -1,6 +1,7 @@
+from utils.other import Container
 
 
-class GridRange:
+class GridRange(Container):
     sheetId: int = None
     startRowIndex: int = None
     endRowIndex: int = None

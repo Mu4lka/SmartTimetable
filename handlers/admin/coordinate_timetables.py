@@ -14,6 +14,8 @@ from filters import IsAdmin, IsPrivate
 from loader import bot, query_table, worker_table, google_timetable
 from timetable import GoogleTimetable
 from utils.methods import make_form
+from utils.services.notification_system.notify_admins.notify_not_accepted_timetables import \
+    accepted_full_names
 
 
 class CoordinationTimetables(StatesGroup):
@@ -70,6 +72,7 @@ async def show_next_timetable(message: types.Message, state: FSMContext):
 async def accept_timetable(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     query = json.loads(user_data["query_data"][QueryField.QUERY_TEXT.value])
+    accepted_full_names.add(user_data[WorkerField.FULL_NAME.value])
     _timetable = query["timetable"]
     await write_item_in_timetable(user_data, _timetable)
     await callback_query.message.edit_text("Вы приняли расписание...")

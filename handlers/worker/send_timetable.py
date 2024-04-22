@@ -10,9 +10,9 @@ from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import WorkerButton
 from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
+from data.constants import certain_days
 from database import WorkerField, QueryField, QueryType
 from filters import IsWorker, IsPrivate, SpecificDays
-from filters.specific_days import Week
 from loader import query_table, worker_table
 from timetable import GoogleTimetable
 from utils.methods import calculate_time_difference
@@ -26,19 +26,11 @@ class SendingTimetable(StatesGroup):
     apply = State()
 
 
-certain_days = [
-    Week.MONDAY,
-    Week.FRIDAY,
-    Week.SATURDAY,
-    Week.SUNDAY
-]
-
-
 @router.callback_query(
     SpecificDays(certain_days),
     StateFilter(None),
     IsWorker(),
-    F.data == WorkerButton.SEND_MY_TIMETABLE.value
+    F.data == WorkerButton.SEND_TIMETABLE.value
 )
 async def start_sending_timetable(callback_query: types.CallbackQuery, state: FSMContext):
     worker_id = await worker_table.get_values_by_telegram_id(
@@ -98,7 +90,7 @@ async def handle_input(callback_query: types.CallbackQuery, state: FSMContext):
 @router.callback_query(
     StateFilter(None),
     IsWorker(),
-    F.data == WorkerButton.SEND_MY_TIMETABLE.value
+    F.data == WorkerButton.SEND_TIMETABLE.value
 )
 async def warn_about_specific_days(callback_query: types.CallbackQuery):
     week_days = []
