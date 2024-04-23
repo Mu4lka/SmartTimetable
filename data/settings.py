@@ -1,7 +1,7 @@
 from utils.methods import get_json_from_file
 from utils.other import Week
 
-config_file_name = "settings.json"
+config_file_path = "../data/settings.json"
 
 settings_example = {
     "certain_days": [4, 5, 6],
@@ -9,7 +9,7 @@ settings_example = {
     "not_accepted_timetables_day": 6
 }
 
-settings = get_json_from_file(config_file_name, settings_example)
+settings = get_json_from_file(config_file_path, settings_example)
 
 CERTAIN_DAYS = [Week(day) for day in settings["certain_days"]]
 WORRY_TIME_START = settings["worry_time"]["start"]

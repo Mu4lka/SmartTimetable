@@ -1,6 +1,6 @@
 from utils.methods import get_json_from_file
 
-config_file_name = "config.json"
+config_file_path = "../data/config.json"
 
 config_example = {
     "bot_token": "токен бота",
@@ -10,7 +10,7 @@ config_example = {
     "spreadsheet_id": "Aйди гугл таблицы"
 }
 
-config = get_json_from_file(config_file_name, config_example)
+config = get_json_from_file(config_file_path, config_example)
 
 BOT_TOKEN = config["bot_token"]
 ADMIN_IDS = config["admin_ids"]

@@ -2,11 +2,11 @@ import sqlite3
 
 
 class Database:
-    def __init__(self, name: str):
-        self.__name = name
+    def __init__(self, path: str):
+        self.__path = path
 
     def execute(self, sql: str, parameters: tuple = None):
-        with sqlite3.connect(f"{self.__name}.db") as connection:
+        with sqlite3.connect(f"{self.__path}") as connection:
             cursor = connection.cursor()
             if parameters is None:
                 parameters = ()

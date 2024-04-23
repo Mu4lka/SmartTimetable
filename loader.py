@@ -14,7 +14,7 @@ spreadsheets = AsyncSpreadsheets(CREDENTIALS_FILE, SPREADSHEET_ID)
 timetable_storage = TimetableStorage(spreadsheets)
 google_timetable = GoogleTimetable(spreadsheets)
 
-database = Database("smart_timetable")
+database = Database("../data/smart_timetable.db")
 worker_table = WorkerTable(database)
 query_table = QueryTable(database)
 error_table = ErrorTable(database)
