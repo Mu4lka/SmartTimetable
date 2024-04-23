@@ -1,8 +1,8 @@
 import asyncio
 from datetime import datetime, timedelta
 
+from data.settings import WORRY_TIME_END, NOT_ACCEPTED_TIMETABLES_DAY
 from database import WorkerField
-from utils.other import Week
 from loader import worker_table
 from utils.methods import send_message_all_admins
 from utils.methods.calculate_time_difference import UnitTime
@@ -12,7 +12,8 @@ accepted_full_names = set()
 
 async def notify_not_accepted_timetables():
     while True:
-        if check_current_time(Week.FRIDAY.value, "20:00"):
+        if check_current_time(
+                NOT_ACCEPTED_TIMETABLES_DAY, WORRY_TIME_END):
             result = await worker_table.select(
                 columns=[WorkerField.FULL_NAME.value]
             )
@@ -23,9 +24,10 @@ async def notify_not_accepted_timetables():
                     not_accepted_full_names.append(full_name)
             accepted_full_names.clear()
             if len(not_accepted_full_names) > 0:
+                message_full_names = '\n'.join(not_accepted_full_names)
                 await send_message_all_admins(
-                    f"Сотрудники, у которых не изменилось расписание "
-                    f"на следующую неделю: {', '.join(not_accepted_full_names)}"
+                    f"<b>Сотрудники, у которых не изменилось расписание "
+                    f"на следующую неделю:</b>\n{message_full_names}"
                 )
         await asyncio.sleep(UnitTime.HOURS.value)
 

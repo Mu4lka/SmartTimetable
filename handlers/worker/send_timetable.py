@@ -10,7 +10,7 @@ from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import WorkerButton
 from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
-from data.constants import certain_days
+from data.settings import CERTAIN_DAYS
 from database import WorkerField, QueryField, QueryType
 from filters import IsWorker, IsPrivate, SpecificDays
 from loader import query_table, worker_table
@@ -27,7 +27,7 @@ class SendingTimetable(StatesGroup):
 
 
 @router.callback_query(
-    SpecificDays(certain_days),
+    SpecificDays(CERTAIN_DAYS),
     StateFilter(None),
     IsWorker(),
     F.data == WorkerButton.SEND_TIMETABLE.value
@@ -48,7 +48,7 @@ async def start_sending_timetable(callback_query: types.CallbackQuery, state: FS
 
 
 @router.message(
-    SpecificDays(certain_days),
+    SpecificDays(CERTAIN_DAYS),
     IsPrivate(),
     StateFilter(SendingTimetable.timetable),
     IsWorker()
@@ -76,7 +76,7 @@ async def process_timetable_input(message: types.Message, state: FSMContext):
 
 
 @router.callback_query(
-    SpecificDays(certain_days),
+    SpecificDays(CERTAIN_DAYS),
     StateFilter(SendingTimetable.apply),
     IsWorker()
 )
@@ -94,7 +94,7 @@ async def handle_input(callback_query: types.CallbackQuery, state: FSMContext):
 )
 async def warn_about_specific_days(callback_query: types.CallbackQuery):
     week_days = []
-    for day in certain_days:
+    for day in CERTAIN_DAYS:
         week_days.append(constants.week_russian[day.value])
     await callback_query.answer(
         f"Отправить расписание вы можете только в определенные дни: {', '.join(week_days)}",

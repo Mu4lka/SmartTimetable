@@ -7,8 +7,8 @@ import keyboard
 def get_json_from_file(path: str, json_data: dict):
     if not os.path.exists(path):
         create_json_file(path, json_data)
-        print(f"File {path} was not found, after which it was created,"
-              f"Change the data and restart the application")
+        print(f"[WARNING] Could not find file named {path}! "
+              f"Restart the application!")
         keyboard.read_key()
         sys.exit()
 

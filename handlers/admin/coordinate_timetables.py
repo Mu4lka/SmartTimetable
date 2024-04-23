@@ -14,8 +14,7 @@ from filters import IsAdmin, IsPrivate
 from loader import bot, query_table, worker_table, google_timetable
 from timetable import GoogleTimetable
 from utils.methods import make_form
-from utils.services.notification_system.notify_admins.notify_not_accepted_timetables import \
-    accepted_full_names
+from utils.services.notification_system.notify_admins.notify_not_accepted_timetables import accepted_full_names
 
 
 class CoordinationTimetables(StatesGroup):
@@ -127,7 +126,8 @@ async def extract_query_data(queries):
 
 async def make_form_for_coordination_timetable(_timetable: dict, full_name: str):
     form = make_form(_timetable["timetable"])
-    return f"Расписание сотрудника {full_name}:\n\n<pre>{form}</pre>\nКоличество часов: {_timetable['hours_number']}"
+    return (f"<b>Согласование расписаний</b>\n\n{full_name}\n<pre>"
+            f"{form}</pre>Количество часов: {_timetable['hours_number']}")
 
 
 async def write_item_in_timetable(user_data, timetable_element: dict):

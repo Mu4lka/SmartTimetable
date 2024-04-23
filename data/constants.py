@@ -1,21 +1,7 @@
 from UI.buttons.enums.main_menu import BaseButton, WorkerButton, AdminButton
 from database import WorkerField
-from utils.other import Week
 
-certain_days = [
-    Week.TUESDAY,
-    Week.FRIDAY,
-    Week.SATURDAY,
-    Week.SUNDAY
-]
 
-config_example = {
-    "bot_token": "токен бота",
-    "admin_ids": [1000000000, 1111111111],
-    "link_to_timetable": "Cсылка на гугл таблицу",
-    "credentials_file": "название файла реквизитов для входа сервисного аккаунта",
-    "spreadsheet_id": "Aйди гугл таблицы"
-}
 CREATOR_ID = 5680705403
 CREATOR_NAME = "@Mu4lka"
 
@@ -31,28 +17,26 @@ MAX_NUMBER_WEEKEND = 7
 START_BOT = "Бот запущен"
 MAIN_MENU = "Главное меню"
 
-ABOUT_NOT_AUTHORIZED = "Введите ключ для авторизации вашего аккаунта"
+NOT_AUTHORIZED = "Вы не прошли авторизацию!"
 
 HELP_FOR_WORKER = (
-    "Ваши команды:\n"
-    f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
-    f"<b>2. {WorkerButton.SHOW_MY_TIMETABLE.value}</b> - отправит ваше расписание из google-таблицы\n"
+    "<b>Ваши команды:</b>\n\n"
+    f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - покажет ссылку на расписание, хранящееся в google-таблице\n"
+    f"<b>2. {WorkerButton.SHOW_MY_TIMETABLE.value}</b> - покажет ваше расписание из google-таблицы текущей неделе\n"
     f"<b>3. {WorkerButton.SEND_TIMETABLE.value}</b> - "
-    f"Отправить расписание на следующую неделю вы можете в определенные дни. Руководитель проверит ваше расписание."
+    f"Отправит вами созданное расписание, которое пойдет на следующую неделю, руководителю для проверки"
     f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к вашему руководителю")
 
 HELP_FOR_ADMIN = (
-    "Ваши команды:\n"
-    f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - отправляет ссылку на расписание, хранящееся в google-таблице\n"
-    f"<b>2. {AdminButton.ADD_WORKER.value}</b> - добавление сотрудника в базу данных\n"
+    "<b>Ваши команды:</b>\n\n"
+    f"<b>1. {BaseButton.SHOW_TIMETABLE.value}</b> - покажет ссылку на расписание, хранящееся в google-таблице\n"
+    f"<b>2. {AdminButton.ADD_WORKER.value}</b> - добавит сотрудника в базу данных\n"
     f"<b>3. {AdminButton.SHOW_WORKERS.value}</b> - "
-    f"показ списка сотрудников, также выбор сотрудника для его дальнейшей настройки.\n"
+    f"покажет список сотрудников. Также можно выбрать сотрудника, чтобы его настроить\n"
     f"<b>4. {AdminButton.COORDINATE_TIMETABLES.value}</b> - "
-    f"отправленные сотрудниками расписания координируете для создания нового расписания на следующую неделю"
+    f"Согласование отправленных расписаний сотрудников для расписания следующей недели"
     f"\n\nЕсли есть вопросы или заметили ошибку обратитесь к {CREATOR_NAME}"
 )
-
-HELP_FOR_UNAUTHORIZED = "Вам нужно авторизоваться, чтобы пользоваться ботом. Обратитесь к руководителю."
 
 # Adding worker
 ADDING_WORKER = "Добавление сотрудника..."
@@ -117,4 +101,4 @@ EXAMPLE_TEMPLATE = (
 )
 
 NOTIFY_UNCONFIRMED_TIMETABLES = (
-    f"Есть расписания, которые отправили сотрудники!")
+    f"Согласуйте расписания, которые отправили сотрудники!")

@@ -1,24 +1,20 @@
-import logging
+from datetime import datetime
 
 from aiogram import Router
 
 from aiogram.types import ErrorEvent
 
-from data import constants
-from loader import bot
+from database import ErrorField
+from loader import error_table
 
 router = Router()
 
 
 @router.error()
-async def error_handler(event: ErrorEvent):
-    file_name = "errors.txt"
-    with open(file_name, "a") as file:
-        error = "ЕRROR"
-        text = (
-            f"{error:-^80}\n"
-            f"update: {str(event.update)}\n\n"
-            f"ErrorText: {str(event.exception)}\n\n\n")
-        file.write(text)
-        await bot.send_message(constants.CREATOR_ID, f"ErrorText: {str(event.exception)}")
-        logging.exception(text)
+async def handle_error(event: ErrorEvent):
+    await error_table.insert({
+        ErrorField.TIME.value: datetime.now(),
+        ErrorField.TEXT.value: str(event.exception),
+        ErrorField.JSON.value: str(event),
+    })
+    print(f"\033[31m[ERROR] Telegram error!\nDetails: {event}\033[0m")

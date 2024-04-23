@@ -1,6 +1,5 @@
 from enum import Enum
 
-from database.worker_table import WorkerTable, WorkerField
 from utils.ease_sql import Table, Database
 
 
@@ -21,9 +20,7 @@ class QueryTable(Table):
     fields = (f"{QueryField.ID.value} INTEGER PRIMARY KEY AUTOINCREMENT,"
               f"{QueryField.WORKER_ID.value} INTEGER,"
               f"{QueryField.TYPE.value} TEXT,"
-              f"{QueryField.QUERY_TEXT.value} TEXT,"
-              f"FOREIGN KEY ({QueryField.WORKER_ID.value})"
-              f"REFERENCES {WorkerTable.name}({WorkerField.ID.value})")
+              f"{QueryField.QUERY_TEXT.value} TEXT")
 
     def __init__(self, database: Database):
         super().__init__(self.name, database, self.fields)

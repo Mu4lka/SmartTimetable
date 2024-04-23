@@ -21,7 +21,7 @@ async def show_worker_timetable(callback_query: types.CallbackQuery):
     )
     row = await find_row_by_name_from_timetable(timetable_storage.get_timetable(), full_name)
     if row is None:
-        text = f"К сожалению Вас, {full_name}, в расписании не нашел, обратитесь к РОПу"
+        text = f"К сожалению Вас, {full_name}, в расписании не нашел, обратитесь к руководителю!"
     else:
         text = (f"<b>Ваше расписание:</b>\n\n"
                 f"<pre>{make_form(dict(zip(constants.week_abbreviated, await get_shifts(row))))}</pre>")

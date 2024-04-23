@@ -39,7 +39,7 @@ async def command_start(message: types.Message, state: FSMContext):
     buttons = await get_buttons(message)
     if not buttons:
         await message.answer(
-            f"Привет {message.from_user.first_name}! {constants.ABOUT_NOT_AUTHORIZED})",
+            f"Привет {message.from_user.first_name}! {constants.NOT_AUTHORIZED})",
             reply_markup=ReplyKeyboardRemove()
         )
         return
@@ -58,7 +58,7 @@ async def command_help(message: types.Message):
     elif await IsWorker().__call__(message):
         message_text = constants.HELP_FOR_WORKER
     else:
-        message_text = constants.HELP_FOR_UNAUTHORIZED
+        message_text = constants.NOT_AUTHORIZED
     await message.answer(message_text, parse_mode="HTML")
 
 
