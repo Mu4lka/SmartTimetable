@@ -1,11 +1,12 @@
 import asyncio
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from data.settings import WORRY_TIME_END, NOT_ACCEPTED_TIMETABLES_DAY
 from database import WorkerField
 from loader import worker_table
 from utils.methods import send_message_all_admins
 from utils.methods.calculate_time_difference import UnitTime
+from utils.methods.get_datetime_now import get_datetime_now
 
 accepted_full_names = set()
 
@@ -33,8 +34,8 @@ async def notify_not_accepted_timetables():
 
 
 def check_current_time(day_of_week: int, time_to_check: str):
-    current_day_of_week = datetime.now().weekday()
-    current_time = datetime.now()
+    current_time = get_datetime_now()
+    current_day_of_week = current_time.weekday()
     hour, minute = map(int, time_to_check.split(':'))
     time_to_check = current_time.replace(hour=hour, minute=minute)
     delta = timedelta(hours=1)

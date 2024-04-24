@@ -1,11 +1,11 @@
 import asyncio
-from datetime import datetime
 from enum import Enum
 
 from utils.google import AsyncSpreadsheets, Sheet
 from utils.google.enums import Dimension
 from utils.google import GridRange
-from utils.methods import get_week_range, is_time_in_range
+from utils.methods import get_week_range, is_time_in_range, get_datetime_now
+from utils.methods.get_datetime_now import get_datetime_now
 
 
 def html_color_to_json(html_color):
@@ -44,7 +44,7 @@ class GoogleTimetable:
 
     @staticmethod
     def get_week_range_name(day: int = 7):
-        next_monday, next_sunday = get_week_range(datetime.now().date(), day)
+        next_monday, next_sunday = get_week_range(get_datetime_now().date(), day)
         return f"{next_monday.strftime('%d.%m')}-{next_sunday.strftime('%d.%m')}"
 
     async def set_sheets(self):

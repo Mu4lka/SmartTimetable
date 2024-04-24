@@ -10,7 +10,7 @@ from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import WorkerButton
 from UI.methods import show_main_menu, make_inline_keyboard
 from data import constants
-from data.settings import CERTAIN_DAYS
+from data.settings import CERTAIN_DAYS, TIMEZONE
 from database import WorkerField, QueryField, QueryType
 from filters import IsWorker, IsPrivate, SpecificDays
 from loader import query_table, worker_table
@@ -117,8 +117,8 @@ async def get_data_for_sending_timetable(user_id: int):
 async def send_template(callback_query: types.CallbackQuery, number_hours: int, number_weekend: int):
     await callback_query.message.edit_text(
         f"<b>Отправьте расписание, которое пойдет на {GoogleTimetable.get_week_range_name()}\n"
-        "Указание времени по Красноярску (GMT+7)\n\n"
-        "Пример шаблона:</b>\n\n"
+        f"Указание времени от GMT +{TIMEZONE}(Красноярск)!\n\n"
+        "Скопируйте шаблон для его редактирования:</b>\n\n"
         f"{constants.EXAMPLE_TEMPLATE}"
         "<b>Ваше расписание должно выполнять следующие требования:</b>\n"
         f"- Минимальное количество часов на неделю: {number_hours}\n"

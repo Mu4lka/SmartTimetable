@@ -3,11 +3,12 @@ from datetime import datetime
 from database import WorkerField
 from loader import bot, worker_table
 from utils.methods import calculate_time_difference
+from utils.methods.get_datetime_now import get_datetime_now
 from utils.methods.calculate_time_difference import UnitTime
 
 
 async def get_shift_starts(timetable: list, workers: dict):
-    weekday = datetime.now().weekday()
+    weekday = get_datetime_now().weekday()
     shift_starts = {}
     for row in timetable:
         try:
@@ -25,7 +26,7 @@ def check_time_until_shift_start(shift_start: str, minutes_threshold=15):
         raise ValueError("Invalid minute value. The value cannot be negative")
 
     time_difference = calculate_time_difference(
-        datetime.now().strftime("%H:%M"),
+        get_datetime_now().strftime("%H:%M"),
         shift_start,
         UnitTime.MINUTES)
     return time_difference == minutes_threshold

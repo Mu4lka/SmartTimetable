@@ -1,8 +1,8 @@
 from aiogram import types
 
+from utils.methods.get_datetime_now import get_datetime_now
 from utils.other import Week
 from aiogram.filters import Filter
-from datetime import datetime
 
 
 class SpecificDays(Filter):
@@ -10,4 +10,4 @@ class SpecificDays(Filter):
         self.__weekdays = weekdays
 
     async def __call__(self, callback_query: types.CallbackQuery):
-        return Week(datetime.now().weekday()) in self.__weekdays
+        return Week(get_datetime_now().weekday()) in self.__weekdays

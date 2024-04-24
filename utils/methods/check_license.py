@@ -10,6 +10,6 @@ async def check_license():
     try:
         await bot.send_message(constants.CREATOR_ID, "Подписан")
     except Exception:
-        print("\033[31m[ERROR] Failed to pass licensing!\033[0m")
+        print("[ERROR] Failed to pass licensing!")
         keyboard.read_key()
         sys.exit()
