@@ -19,23 +19,26 @@ async def show_worker_timetable(callback_query: types.CallbackQuery):
         callback_query.from_user.id,
         [WorkerField.FULL_NAME.value,]
     )
-    row = await find_row_by_name_from_timetable(timetable_storage.get_timetable(), full_name)
-    if row is None:
+    element = await find_element_by_name_from_timetable(
+        timetable_storage.get_timetable(),
+        full_name
+    )
+    if element is None:
         text = f"К сожалению Вас, {full_name}, в расписании не нашел, обратитесь к руководителю!"
     else:
         text = (f"<b>Ваше расписание:</b>\n\n"
-                f"<pre>{make_form(dict(zip(constants.week_abbreviated, await get_shifts(row))))}</pre>")
+                f"<pre>{make_form(dict(zip(constants.week_abbreviated, await get_shifts(element))))}</pre>")
     await callback_query.message.edit_text(text, parse_mode="HTML")
     await show_main_menu(callback_query.message, worker_buttons)
 
 
-async def find_row_by_name_from_timetable(_timetable: list, name: str):
-    for row in _timetable:
-        if name in row:
-            return row
+async def find_element_by_name_from_timetable(timetable: list, name: str):
+    for element in timetable:
+        if name in element:
+            return element
 
 
-async def get_shifts(row: list):
-    shifts = row.copy()
+async def get_shifts(timetable_element: list):
+    shifts = timetable_element.copy()
     shifts.pop(0)
     return shifts

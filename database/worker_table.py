@@ -56,11 +56,3 @@ class WorkerTable(Table):
             columns
         )
         return result[0][0]
-
-    async def worker_number(self, worker_id):
-        result = await self.select()
-        index = 0
-        for worker in result:
-            if worker_id in worker:
-                return index
-            index += 1

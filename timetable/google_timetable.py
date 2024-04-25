@@ -1,10 +1,11 @@
 import asyncio
 from enum import Enum
 
+import loader
 from utils.google import AsyncSpreadsheets, Sheet
 from utils.google.enums import Dimension
 from utils.google import GridRange
-from utils.methods import get_week_range, is_time_in_range, get_datetime_now
+from utils.methods import get_week_range, is_time_in_range
 from utils.methods.get_datetime_now import get_datetime_now
 
 
@@ -28,8 +29,20 @@ class GoogleTimetable:
         self.__spreadsheets = spreadsheets
         self.sheets = {}
 
-    async def write_element(self, element: list, position: int, sheet_name: str):
+    @staticmethod
+    async def get_element_position(entry_element: list, sheet_name: str):
+        timetable = await loader.timetable_storage.get_current_timetable(sheet_name)
+        for item in range(len(timetable)):
+            try:
+                if entry_element[0] == timetable[item][0]:
+                    return item + 1
+            except Exception:
+                pass
+        return len(timetable) + 1
+
+    async def write_element(self, element: list, sheet_name: str):
         try:
+            position = await self.get_element_position(element, sheet_name)
             await self.__spreadsheets.async_batch_update_values(
                 f"{sheet_name}!A{position}:Z{position}",
                 Dimension.ROWS,
@@ -40,7 +53,7 @@ class GoogleTimetable:
             print(f"[WARNING] Failed write for next week."
                   f"Try to create a copy of the sheet![TO_RETRY]\nDetails: {error}")
             await self.copy_timetable(sheet_name)
-            await self.write_element(element, position, sheet_name)
+            await self.write_element(element, sheet_name)
 
     @staticmethod
     def get_week_range_name(day: int = 7):

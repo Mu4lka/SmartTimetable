@@ -26,7 +26,7 @@ router = Router()
 
 
 @router.callback_query(StateFilter(None), IsAdmin(), F.data == AdminButton.COORDINATE_TIMETABLES.value)
-async def coordinate_timetables(callback_query: types.CallbackQuery, state: FSMContext):
+async def coordinate_timetable_elements(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.delete()
     queries = await query_table.get_queries(QueryType.SENDING_TIMETABLE)
 
@@ -72,8 +72,8 @@ async def accept_timetable(callback_query: types.CallbackQuery, state: FSMContex
     user_data = await state.get_data()
     query = json.loads(user_data["query_data"][QueryField.QUERY_TEXT.value])
     accepted_full_names.add(user_data[WorkerField.FULL_NAME.value])
-    _timetable = query["timetable"]
-    await write_item_in_timetable(user_data, _timetable)
+    timetable = query["timetable"]
+    await write_element_in_timetable(user_data, timetable)
     await callback_query.message.edit_text("Вы приняли расписание...")
     await bot.send_message(user_data[WorkerField.TELEGRAM_ID.value], f"Ваше расписание принято!")
     await delete_query(callback_query.message, state)
@@ -124,19 +124,19 @@ async def extract_query_data(queries):
     }
 
 
-async def make_form_for_coordination_timetable(_timetable: dict, full_name: str):
-    form = make_form(_timetable["timetable"])
+async def make_form_for_coordination_timetable(timetable: dict, full_name: str):
+    form = make_form(timetable["timetable"])
     return (f"<b>Согласование расписаний</b>\n\n{full_name}\n<pre>"
-            f"{form}</pre>Количество часов: {_timetable['hours_number']}")
+            f"{form}</pre>Количество часов: {timetable['hours_number']}")
 
 
-async def write_item_in_timetable(user_data, timetable_element: dict):
-    worker_id = user_data["query_data"][QueryField.WORKER_ID.value]
-    position = await worker_table.worker_number(worker_id) + 2
-    element = ([user_data[WorkerField.FULL_NAME.value]]
-               + list(timetable_element.values()))
+async def write_element_in_timetable(user_data, timetable_element: dict):
+    element = (
+            [user_data[WorkerField.FULL_NAME.value]] +
+            list(timetable_element.values())
+    )
     next_week_name = GoogleTimetable.get_week_range_name()
-    await google_timetable.write_element(element, position, next_week_name)
+    await google_timetable.write_element(element, next_week_name)
 
 
 async def delete_query(message: types.Message, state: FSMContext):
