@@ -1,6 +1,6 @@
 from aiogram import Bot, Dispatcher
 
-from data import config
+from data import config, main_path
 from timetable import TimetableStorage, GoogleTimetable
 from database import WorkerTable, QueryTable, ErrorTable
 from utils.ease_sql import Database
@@ -16,7 +16,7 @@ spreadsheets = AsyncSpreadsheets(
 timetable_storage = TimetableStorage(spreadsheets)
 google_timetable = GoogleTimetable(spreadsheets)
 
-database = Database("../data/smart_timetable.db")
+database = Database(main_path + "smart_timetable.db")
 worker_table = WorkerTable(database)
 query_table = QueryTable(database)
 error_table = ErrorTable(database)

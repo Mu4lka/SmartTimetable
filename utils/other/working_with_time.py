@@ -21,15 +21,15 @@ class TimeRange:
     def difference_in_second(self):
         start = datetime.strptime(self.start, "%H:%M")
         if self.end == "24:00":
-            second_time = datetime.combine(
+            end = datetime.combine(
                 start.date() + timedelta(days=1), datetime.min.time()
             )
         else:
-            second_time = datetime.strptime(
+            end = datetime.strptime(
                 self.end, "%H:%M"
             )
-        if start > second_time:
-            second_time += timedelta(days=1)
+        if start > end:
+            end += timedelta(days=1)
 
-        shift_duration = second_time - start
+        shift_duration = end - start
         return shift_duration.total_seconds()

@@ -1,7 +1,7 @@
 from .json_files import Save, Settings, Config
 
-first_path = "../data/"
+main_path = "../data/"
 
-save = Save(first_path + "save.json")
-config = Config(first_path + "config.json")
-settings = Settings(first_path + "settings.json")
+save = Save(main_path + "save.json")
+config = Config(main_path + "config.json")
+settings = Settings(main_path + "settings.json")
