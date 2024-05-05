@@ -84,4 +84,3 @@ class Table(BaseTable):
         if condition is not None:
             sql += f" WHERE {condition}"
         return sql
-

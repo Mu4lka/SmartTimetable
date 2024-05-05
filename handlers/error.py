@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import Router
 
 from aiogram.types import ErrorEvent
@@ -16,4 +18,4 @@ async def handle_error(event: ErrorEvent):
         ErrorField.TEXT.value: str(event.exception),
         ErrorField.JSON.value: str(event),
     })
-    print(f"[ERROR] Telegram error!\nDetails: {event}")
+    logging.exception(event.exception)

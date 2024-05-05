@@ -3,7 +3,6 @@ import asyncio
 import loader
 from utils.google import AsyncSpreadsheets
 from utils.google.enums import Dimension
-from utils.methods.calculate_time_difference import UnitTime
 from utils.other import Event
 
 
@@ -36,7 +35,7 @@ class TimetableStorage:
             try:
                 current_timetable = await self.get_current_timetable(sheet_name)
             except Exception as error:
-                await asyncio.sleep(UnitTime.SECONDS.value)
+                await asyncio.sleep(1)
                 print(f"[WARNING] Failed to get data from Google sheet. "
                       f"Try to create a copy of the sheet![TO_RETRY]\nDetails: {error}")
                 await loader.google_timetable.copy_timetable(sheet_name)
@@ -57,4 +56,4 @@ class TimetableStorage:
                               f"Details: {error}")
             self.__timetable_name = sheet_name
             self.__timetable = current_timetable
-            await asyncio.sleep(UnitTime.MINUTES.value)
+            await asyncio.sleep(60)

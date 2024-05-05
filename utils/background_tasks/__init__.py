@@ -4,4 +4,4 @@ from utils.background_tasks.copy_timetable_to_specific_days import copy_timetabl
 
 
 async def start_copy_timetable():
-    task = asyncio.create_task(copy_timetable_to_specific_days())
+    _ = asyncio.create_task(copy_timetable_to_specific_days())

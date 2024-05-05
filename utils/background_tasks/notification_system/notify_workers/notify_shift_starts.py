@@ -2,9 +2,8 @@ from datetime import datetime
 
 from database import WorkerField
 from loader import bot, worker_table
-from utils.methods import calculate_time_difference
 from utils.methods.get_datetime_now import get_datetime_now
-from utils.methods.calculate_time_difference import UnitTime
+from utils.other import TimeRange
 
 
 async def get_shift_starts(timetable: list, workers: dict):
@@ -25,11 +24,10 @@ def check_time_until_shift_start(shift_start: str, minutes_threshold=15):
     if minutes_threshold < 0:
         raise ValueError("Invalid minute value. The value cannot be negative")
 
-    time_difference = calculate_time_difference(
-        get_datetime_now().strftime("%H:%M"),
-        shift_start,
-        UnitTime.MINUTES)
-    return time_difference == minutes_threshold
+    time_range = TimeRange(
+        get_datetime_now().strftime("%H:%M"), shift_start)
+    difference = time_range.difference_in_second()/60
+    return difference == minutes_threshold
 
 
 async def notify_shift_starts(timetable: list, minutes_threshold=15):

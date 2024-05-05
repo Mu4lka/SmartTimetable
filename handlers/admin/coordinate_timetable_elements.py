@@ -9,12 +9,12 @@ from UI.buttons.data_buttons import admin_buttons
 from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import AdminButton
 from UI.methods import show_main_menu, make_inline_keyboard
+from data import save
 from database import WorkerField, QueryField, QueryType
 from filters import IsAdmin, IsPrivate
 from loader import bot, query_table, worker_table, google_timetable
 from timetable import GoogleTimetable
 from utils.methods import make_form
-from utils.background_tasks.notification_system.notify_admins.notify_not_accepted_timetables import accepted_full_names
 
 
 class CoordinationTimetables(StatesGroup):
@@ -71,7 +71,8 @@ async def show_next_timetable(message: types.Message, state: FSMContext):
 async def accept_timetable(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     query = json.loads(user_data["query_data"][QueryField.QUERY_TEXT.value])
-    accepted_full_names.add(user_data[WorkerField.FULL_NAME.value])
+    save.ACCEPTED_FULL_NAMES.append(user_data[WorkerField.FULL_NAME.value])
+    save.unload()
     timetable = query["timetable"]
     await write_element_in_timetable(user_data, timetable)
     await callback_query.message.edit_text("Вы приняли расписание...")

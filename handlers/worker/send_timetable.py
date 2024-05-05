@@ -9,14 +9,12 @@ from UI.buttons.data_buttons import worker_buttons
 from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import WorkerButton
 from UI.methods import show_main_menu, make_inline_keyboard
-from data import constants
-from data.settings import CERTAIN_DAYS, TIMEZONE
+from data import constants, settings
 from database import WorkerField, QueryField, QueryType
 from filters import IsWorker, IsPrivate, SpecificDays
 from loader import query_table, worker_table
 from timetable import GoogleTimetable
-from utils.methods import calculate_time_difference
-from utils.methods.calculate_time_difference import UnitTime
+from utils.other import TimeRange
 
 router = Router()
 
@@ -27,7 +25,7 @@ class SendingTimetable(StatesGroup):
 
 
 @router.callback_query(
-    SpecificDays(CERTAIN_DAYS),
+    SpecificDays(settings.CERTAIN_DAYS),
     StateFilter(None),
     IsWorker(),
     F.data == WorkerButton.SEND_TIMETABLE.value
@@ -48,7 +46,7 @@ async def start_sending_timetable(callback_query: types.CallbackQuery, state: FS
 
 
 @router.message(
-    SpecificDays(CERTAIN_DAYS),
+    SpecificDays(settings.CERTAIN_DAYS),
     IsPrivate(),
     StateFilter(SendingTimetable.timetable),
     IsWorker()
@@ -76,7 +74,7 @@ async def process_timetable_input(message: types.Message, state: FSMContext):
 
 
 @router.callback_query(
-    SpecificDays(CERTAIN_DAYS),
+    SpecificDays(settings.CERTAIN_DAYS),
     StateFilter(SendingTimetable.apply),
     IsWorker()
 )
@@ -94,8 +92,8 @@ async def handle_input(callback_query: types.CallbackQuery, state: FSMContext):
 )
 async def warn_about_specific_days(callback_query: types.CallbackQuery):
     week_days = []
-    for day in CERTAIN_DAYS:
-        week_days.append(constants.week_russian[day.value])
+    for day in settings.CERTAIN_DAYS:
+        week_days.append(constants.week_russian[day])
     await callback_query.answer(
         f"Отправить расписание вы можете только в определенные дни: {', '.join(week_days)}",
         show_alert=True
@@ -117,7 +115,7 @@ async def get_data_for_sending_timetable(user_id: int):
 async def send_template(callback_query: types.CallbackQuery, number_hours: int, number_weekend: int):
     await callback_query.message.edit_text(
         f"<b>Отправьте расписание, которое пойдет на {GoogleTimetable.get_week_range_name()}\n"
-        f"Указание времени от GMT +{TIMEZONE}(Красноярск)!\n\n"
+        f"Указание времени от GMT +{settings.TIMEZONE}(Красноярск)!\n\n"
         "Скопируйте шаблон для его редактирования:</b>\n\n"
         f"{constants.EXAMPLE_TEMPLATE}"
         "<b>Ваше расписание должно выполнять следующие требования:</b>\n"
@@ -156,8 +154,9 @@ async def calculate_shift_duration(shift: str):
     if shift == constants.day_off:
         return 0.0
 
-    time_start_str, time_end_str = shift.split("-", 1)
-    shift_duration = calculate_time_difference(time_start_str, time_end_str, UnitTime.HOURS)
+    start, end = shift.split("-", 1)
+    time_range = TimeRange(start, end)
+    shift_duration = time_range.difference_in_second()/3600
     remainder = shift_duration % 1
     if remainder == 0.5 or remainder == 0:
         return shift_duration

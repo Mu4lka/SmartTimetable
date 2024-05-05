@@ -7,8 +7,7 @@ from UI.buttons.data_buttons import worker_buttons, admin_buttons
 from UI.buttons.enums import OtherButton
 from UI.buttons.enums.main_menu import BaseButton
 from UI.methods import show_main_menu, get_buttons, make_keyboard
-from data import constants
-from data.config import LINK_TO_TIMETABLE
+from data import constants, config
 from filters import IsAuthorized, IsPrivate, IsWorker, IsAdmin
 from loader import worker_table
 
@@ -17,13 +16,13 @@ router = Router()
 
 @router.callback_query(StateFilter(None), IsAdmin(), F.data == BaseButton.SHOW_TIMETABLE.value)
 async def show_timetable_for_admin(callback_query: types.CallbackQuery):
-    await callback_query.message.edit_text(LINK_TO_TIMETABLE)
+    await callback_query.message.edit_text(config.LINK_TO_TIMETABLE)
     await show_main_menu(callback_query.message, admin_buttons)
 
 
 @router.callback_query(StateFilter(None), IsWorker(), F.data == BaseButton.SHOW_TIMETABLE.value)
 async def show_timetable(callback_query: types.CallbackQuery):
-    await callback_query.message.edit_text(LINK_TO_TIMETABLE)
+    await callback_query.message.edit_text(config.LINK_TO_TIMETABLE)
     await show_main_menu(callback_query.message, worker_buttons)
 
 

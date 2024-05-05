@@ -1,12 +1,14 @@
 import asyncio
+import logging
 from enum import Enum
 
 import loader
 from utils.google import AsyncSpreadsheets, Sheet
 from utils.google.enums import Dimension
 from utils.google import GridRange
-from utils.methods import get_week_range, is_time_in_range
+from utils.methods import get_week_range
 from utils.methods.get_datetime_now import get_datetime_now
+from utils.other import TimeRange
 
 
 def html_color_to_json(html_color):
@@ -49,9 +51,8 @@ class GoogleTimetable:
                 [element, ]
             )
             await self.__paint_background(element, position, sheet_name)
-        except Exception as error:
-            print(f"[WARNING] Failed write for next week."
-                  f"Try to create a copy of the sheet![TO_RETRY]\nDetails: {error}")
+        except Exception as e:
+            logging.exception(e)
             await self.copy_timetable(sheet_name)
             await self.write_element(element, sheet_name)
 
@@ -91,18 +92,18 @@ class GoogleTimetable:
 
     @staticmethod
     def __get_background(start_shift: str):
+        backgrounds = {
+            TimeRange("05:00", "11:59"): Background.MORNING,
+            TimeRange("12:00", "15:59"): Background.AFTERNOON,
+            TimeRange("16:00", "04:59"): Background.EVENING
+        }
         try:
-            if is_time_in_range("05:00", "11:59", start_shift):
-                background = Background.MORNING
-            elif is_time_in_range("12:00", "15:59", start_shift):
-                background = Background.AFTERNOON
-            elif is_time_in_range("16:00", "04:59", start_shift):
-                background = Background.EVENING
-            else:
-                background = Background.NONE
-        except Exception:
-            background = Background.NONE
-        return background
+            for time_range, background in backgrounds.items():
+                if time_range.time_is_in_range(start_shift):
+                    return background
+        except Exception as e:
+            logging.error(e)
+        return Background.NONE
 
     async def __paint_background(self, element: list, position: int, sheet_name: str):
         values = []

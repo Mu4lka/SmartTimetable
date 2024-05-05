@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.filters import Filter
 
-from data.config import ADMIN_IDS
+from data import config
 
 
 class IsAdmin(Filter):
@@ -9,7 +9,7 @@ class IsAdmin(Filter):
         if user_id is None:
             user_id = message.from_user.id
 
-        for admin_id in ADMIN_IDS:
+        for admin_id in config.ADMIN_IDS:
             if user_id == admin_id:
                 return True
         return False
