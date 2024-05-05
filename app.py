@@ -5,10 +5,10 @@ from loader import bot, dispatcher
 from utils.methods import set_default_commands
 from utils.methods.check_license import check_license
 from utils.methods.on_startup_notify import on_startup_notify
-from utils.services.notification_system.notify_admins import start_update_query, \
+from utils.background_tasks.notification_system.notify_admins import start_update_query, \
     start_notify_not_accepted_timetables
-from utils.services.notification_system.notify_workers import start_update_timetable
-from utils.services import start_copy_timetable
+from utils.background_tasks.notification_system.notify_workers import start_update_timetable
+from utils.background_tasks import start_copy_timetable
 
 
 async def on_startup():

@@ -14,6 +14,7 @@ class TimetableStorage:
 
         self.__spreadsheets = spreadsheets
         self.__timetable = []
+        self.__timetable_name = ""
 
     def get_timetable(self):
         return self.__timetable.copy()
@@ -41,17 +42,19 @@ class TimetableStorage:
                 await loader.google_timetable.copy_timetable(sheet_name)
                 continue
             await self.on_update.invoke(self.__timetable.copy())
-            for item in range(len(self.__timetable)):
-                try:
-                    if self.__timetable[item] != current_timetable[item]:
-                        await self.on_change.invoke(
-                            current_timetable[item].copy(),
-                            self.__timetable[item].copy(),
-                            sheet_name
-                        )
-                except Exception as error:
-                    print(f"[WARNING] The operation failed"
-                          f" when comparing timetable elements.\n"
-                          f"Details: {error}")
+            if self.__timetable_name == sheet_name:
+                for i in range(len(self.__timetable)):
+                    try:
+                        if self.__timetable[i] != current_timetable[i]:
+                            await self.on_change.invoke(
+                                current_timetable[i].copy(),
+                                self.__timetable[i].copy(),
+                                sheet_name
+                            )
+                    except Exception as error:
+                        print(f"[WARNING] The operation failed"
+                              f" when comparing timetable elements.\n"
+                              f"Details: {error}")
+            self.__timetable_name = sheet_name
             self.__timetable = current_timetable
             await asyncio.sleep(UnitTime.MINUTES.value)

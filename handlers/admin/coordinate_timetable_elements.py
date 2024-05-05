@@ -14,7 +14,7 @@ from filters import IsAdmin, IsPrivate
 from loader import bot, query_table, worker_table, google_timetable
 from timetable import GoogleTimetable
 from utils.methods import make_form
-from utils.services.notification_system.notify_admins.notify_not_accepted_timetables import accepted_full_names
+from utils.background_tasks.notification_system.notify_admins.notify_not_accepted_timetables import accepted_full_names
 
 
 class CoordinationTimetables(StatesGroup):

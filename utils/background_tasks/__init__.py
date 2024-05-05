@@ -1,6 +1,6 @@
 import asyncio
 
-from utils.services.copy_timetable_to_specific_days import copy_timetable_to_specific_days
+from utils.background_tasks.copy_timetable_to_specific_days import copy_timetable_to_specific_days
 
 
 async def start_copy_timetable():
