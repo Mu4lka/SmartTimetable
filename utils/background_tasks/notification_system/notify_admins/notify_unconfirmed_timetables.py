@@ -4,7 +4,7 @@ from data import constants, settings
 from database import QueryType
 from loader import query_table
 from utils.methods import send_message_all_admins
-from utils.methods.get_datetime_now import get_datetime_now
+from utils.other.working_with_time import get_datetime_now
 
 
 async def notify_unconfirmed_timetables():

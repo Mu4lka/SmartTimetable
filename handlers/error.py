@@ -6,7 +6,7 @@ from aiogram.types import ErrorEvent
 
 from database import ErrorField
 from loader import error_table
-from utils.methods.get_datetime_now import get_datetime_now
+from utils.other.working_with_time import get_datetime_now
 
 router = Router()
 

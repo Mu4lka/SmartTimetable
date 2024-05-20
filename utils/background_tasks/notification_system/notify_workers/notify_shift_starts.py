@@ -2,8 +2,8 @@ from datetime import datetime
 
 from database import WorkerField
 from loader import bot, worker_table
-from utils.methods.get_datetime_now import get_datetime_now
 from utils.other import TimeRange
+from utils.other.working_with_time import get_datetime_now
 
 
 async def get_shift_starts(timetable: list, workers: dict):

@@ -3,7 +3,8 @@ import asyncio
 from data import settings, save
 from database import WorkerField
 from loader import worker_table
-from utils.methods import send_message_all_admins, check_current_time
+from utils.methods import send_message_all_admins
+from utils.other.working_with_time import check_current_time
 
 
 async def get_not_accepted_full_names():

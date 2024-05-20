@@ -1,9 +1,9 @@
 import asyncio
 
 from data import settings
-from utils.methods.get_datetime_now import get_datetime_now
 from loader import google_timetable
 from timetable import GoogleTimetable
+from utils.other.working_with_time import get_datetime_now
 
 
 async def copy_timetable_to_specific_days():

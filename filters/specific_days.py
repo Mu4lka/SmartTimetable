@@ -1,7 +1,8 @@
 from aiogram import types
 
-from utils.methods.get_datetime_now import get_datetime_now
 from aiogram.filters import Filter
+
+from utils.other.working_with_time import get_datetime_now
 
 
 class SpecificDays(Filter):

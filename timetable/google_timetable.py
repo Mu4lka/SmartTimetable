@@ -6,9 +6,8 @@ import loader
 from utils.google import AsyncSpreadsheets, Sheet
 from utils.google.enums import Dimension
 from utils.google import GridRange
-from utils.methods import get_week_range
-from utils.methods.get_datetime_now import get_datetime_now
 from utils.other import TimeRange
+from utils.other.working_with_time import get_week_range, get_datetime_now
 
 
 def html_color_to_json(html_color):
